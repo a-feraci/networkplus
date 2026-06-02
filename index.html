@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NeTwOrK+ // Study Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Baloo+2:wght@500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   NeTwOrK+  ·  kawaii-cyberpunk CompTIA Network+ study deck
+   ============================================================ */
+:root{
+  --bg0:#150a2e; --bg1:#1d0f42; --bg2:#23114f;
+  --pink:#ff4fd8; --pink-soft:#ff9fe8; --pink-pastel:#ffc9f0;
+  --purple:#a86bff; --purple-soft:#c6a4ff; --purple-pastel:#e0d2ff;
+  --green:#48ffc0; --green-soft:#8effd8; --green-pastel:#caffe9;
+  --white:#ffffff; --ink:#fdeeff; --ink-dim:#cdb9e6;
+  --card:rgba(45,22,86,.55); --card-line:rgba(255,159,232,.35);
+  --glow-pink:0 0 12px rgba(255,79,216,.7);
+  --glow-green:0 0 12px rgba(72,255,192,.7);
+  --glow-purple:0 0 12px rgba(168,107,255,.7);
+  --radius:26px;
+  --f-title:'Press Start 2P',monospace;
+  --f-head:'Baloo 2',cursive;
+  --f-body:'Quicksand',sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{
+  font-family:var(--f-body);
+  color:var(--ink);
+  overflow:hidden;                 /* page itself never scrolls */
+  display:flex;flex-direction:column;
+  background:var(--bg0);
+  -webkit-tap-highlight-color:transparent;
+}
+/* ---- fixed, non-scrolling background ---- */
+#bg{
+  position:fixed;inset:0;z-index:-3;
+  background:
+    radial-gradient(900px 600px at 12% 8%, rgba(255,79,216,.22), transparent 60%),
+    radial-gradient(900px 700px at 88% 18%, rgba(168,107,255,.25), transparent 60%),
+    radial-gradient(1000px 700px at 70% 95%, rgba(72,255,192,.18), transparent 60%),
+    linear-gradient(160deg,var(--bg0),var(--bg1) 55%,var(--bg2));
+}
+#grid{
+  position:fixed;inset:-50% 0 0 0;z-index:-2;height:200%;
+  background-image:
+    linear-gradient(rgba(255,159,232,.10) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(198,164,255,.10) 1px,transparent 1px);
+  background-size:46px 46px;
+  transform:perspective(420px) rotateX(58deg) translateY(0);
+  animation:gridmove 9s linear infinite;
+  opacity:.55;mask-image:linear-gradient(to bottom,transparent,#000 30%,#000 60%,transparent);
+}
+@keyframes gridmove{from{background-position:0 0;}to{background-position:0 46px;}}
+#stars{position:fixed;inset:0;z-index:-1;pointer-events:none;}
+.star{position:absolute;width:3px;height:3px;border-radius:50%;background:var(--pink-soft);
+  box-shadow:var(--glow-pink);animation:tw 3s ease-in-out infinite;}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.7);}50%{opacity:1;transform:scale(1.3);}}
+
+/* ---------------- HEADER (robot + title + master bar) --------------- */
+header{
+  flex:0 0 auto;text-align:center;padding:10px 12px 6px;position:relative;z-index:5;
+}
+#robot{width:74px;height:74px;display:inline-block;animation:bob 3.2s ease-in-out infinite;filter:drop-shadow(var(--glow-green));}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-7px) rotate(2deg);}}
+.robot-eye{animation:blink 4s infinite;transform-origin:center;}
+@keyframes blink{0%,92%,100%{transform:scaleY(1);}96%{transform:scaleY(.1);}}
+
+h1#title{
+  font-family:var(--f-title);font-size:clamp(20px,5vw,40px);margin:4px 0 2px;letter-spacing:1px;
+  position:relative;display:inline-block;color:var(--white);
+  text-shadow:0 0 6px var(--pink),0 0 16px rgba(255,79,216,.7);
+}
+h1#title::before,h1#title::after{
+  content:attr(data-text);position:absolute;left:0;top:0;width:100%;overflow:hidden;
+}
+h1#title::before{color:var(--green);text-shadow:0 0 8px var(--green);
+  animation:glitchA 2.6s infinite linear alternate-reverse;clip-path:inset(0 0 60% 0);}
+h1#title::after{color:var(--purple);text-shadow:0 0 8px var(--purple);
+  animation:glitchB 2.1s infinite linear alternate-reverse;clip-path:inset(55% 0 0 0);}
+@keyframes glitchA{0%{transform:translate(0,0);}20%{transform:translate(-3px,1px);}40%{transform:translate(2px,-1px);}60%{transform:translate(-2px,0);}80%{transform:translate(3px,1px);}100%{transform:translate(0,0);}}
+@keyframes glitchB{0%{transform:translate(0,0);}25%{transform:translate(3px,-1px);}50%{transform:translate(-3px,1px);}75%{transform:translate(2px,1px);}100%{transform:translate(0,0);}}
+.subtitle{font-family:var(--f-head);color:var(--green-soft);font-size:13px;margin:0 0 6px;letter-spacing:.5px;}
+
+/* master progress bar (always visible, top of page) */
+#master-wrap{max-width:680px;margin:2px auto 0;padding:0 10px;}
+#master-bar-shell{height:18px;border-radius:30px;background:rgba(20,8,46,.7);
+  border:1.5px solid var(--card-line);overflow:hidden;position:relative;box-shadow:inset 0 0 8px rgba(0,0,0,.4);}
+#master-bar-fill{height:100%;width:0%;border-radius:30px;
+  background:linear-gradient(90deg,var(--pink),var(--purple) 50%,var(--green));
+  background-size:200% 100%;animation:shimmer 3s linear infinite;
+  transition:width .6s cubic-bezier(.2,.9,.2,1);box-shadow:0 0 12px rgba(255,79,216,.6);}
+@keyframes shimmer{from{background-position:0 0;}to{background-position:200% 0;}}
+#master-label{font-family:var(--f-head);font-weight:700;font-size:12px;margin-top:3px;color:var(--ink);}
+#master-label b{color:var(--green-soft);}
+
+/* ---------------- SHELL (the only scrolling area) --------------- */
+#shell{
+  flex:1 1 auto;min-height:0;width:min(960px,94vw);margin:6px auto 14px;
+  background:rgba(30,15,66,.62);backdrop-filter:blur(7px);
+  border:2px solid var(--card-line);border-radius:var(--radius);
+  box-shadow:0 0 0 2px rgba(72,255,192,.10),0 18px 60px rgba(0,0,0,.5),inset 0 0 60px rgba(168,107,255,.08);
+  overflow:hidden;position:relative;
+}
+#shell::before{content:"";position:absolute;inset:0;border-radius:var(--radius);pointer-events:none;
+  box-shadow:inset 0 0 22px rgba(255,79,216,.18);}
+#content{height:100%;overflow-y:auto;overflow-x:hidden;padding:22px 24px 40px;scroll-behavior:smooth;}
+/* transparent custom scrollbar */
+#content::-webkit-scrollbar{width:10px;}
+#content::-webkit-scrollbar-track{background:transparent;}
+#content::-webkit-scrollbar-thumb{background:linear-gradient(var(--pink),var(--purple));
+  border-radius:20px;opacity:.5;border:2px solid transparent;background-clip:padding-box;}
+#content::-webkit-scrollbar-thumb:hover{background:linear-gradient(var(--green),var(--purple));background-clip:padding-box;}
+#content{scrollbar-width:thin;scrollbar-color:rgba(168,107,255,.6) transparent;}
+
+/* ---------------- HAMBURGER NAV --------------- */
+#hamburger{position:fixed;top:12px;left:12px;z-index:40;width:46px;height:46px;border-radius:14px;
+  background:rgba(45,22,86,.8);border:2px solid var(--pink);cursor:pointer;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:5px;box-shadow:var(--glow-pink);transition:.2s;}
+#hamburger:hover{transform:scale(1.06);}
+#hamburger span{width:22px;height:2.6px;background:var(--green);border-radius:3px;transition:.3s;box-shadow:var(--glow-green);}
+#hamburger.open span:nth-child(1){transform:translateY(7.6px) rotate(45deg);}
+#hamburger.open span:nth-child(2){opacity:0;}
+#hamburger.open span:nth-child(3){transform:translateY(-7.6px) rotate(-45deg);}
+#nav{position:fixed;top:66px;left:12px;z-index:39;width:248px;max-height:80vh;overflow-y:auto;
+  background:rgba(30,15,66,.96);border:2px solid var(--purple);border-radius:18px;
+  box-shadow:0 14px 50px rgba(0,0,0,.6),var(--glow-purple);padding:10px;
+  transform:translateX(-120%) scale(.9);opacity:0;pointer-events:none;transition:.32s cubic-bezier(.2,.9,.2,1);}
+#nav.open{transform:translateX(0) scale(1);opacity:1;pointer-events:auto;}
+#nav a{display:flex;align-items:center;gap:9px;padding:10px 12px;margin:3px 0;border-radius:12px;
+  color:var(--ink);text-decoration:none;font-family:var(--f-head);font-weight:600;font-size:15px;transition:.18s;}
+#nav a:hover{background:rgba(255,79,216,.18);transform:translateX(4px);color:var(--white);}
+#nav a.active{background:linear-gradient(90deg,rgba(255,79,216,.3),rgba(72,255,192,.15));border:1px solid var(--pink);}
+#nav .navhead{font-family:var(--f-title);font-size:9px;color:var(--green-soft);padding:8px 12px 2px;letter-spacing:1px;}
+#nav .ico{font-size:17px;}
+
+#mute{position:fixed;top:12px;right:12px;z-index:40;width:46px;height:46px;border-radius:14px;
+  background:rgba(45,22,86,.8);border:2px solid var(--green);color:var(--green);font-size:18px;cursor:pointer;
+  box-shadow:var(--glow-green);transition:.2s;}
+#mute:hover{transform:scale(1.06);}
+
+/* ---------------- CONTENT STYLES --------------- */
+h2.page-title{font-family:var(--f-head);font-weight:800;font-size:clamp(22px,4vw,30px);margin:0 0 4px;
+  color:var(--white);text-shadow:0 0 10px rgba(168,107,255,.6);}
+.page-sub{color:var(--ink-dim);margin:0 0 18px;font-size:14px;}
+.lead{font-size:15px;line-height:1.6;color:var(--ink);}
+a.inline{color:var(--green-soft);font-weight:700;text-decoration:none;border-bottom:1.5px dotted var(--green);}
+a.inline:hover{color:var(--white);}
+
+.card{background:var(--card);border:1.5px solid var(--card-line);border-radius:18px;padding:16px 18px;margin:14px 0;
+  box-shadow:0 8px 26px rgba(0,0,0,.3);}
+.grid{display:grid;gap:14px;}
+@media(min-width:620px){.grid.two{grid-template-columns:1fr 1fr;}}
+
+/* unit cards (lesson plan) */
+.unit-card{cursor:pointer;border:2px solid var(--card-line);border-radius:20px;padding:16px;position:relative;overflow:hidden;
+  background:linear-gradient(140deg,rgba(255,79,216,.10),rgba(168,107,255,.08));transition:.22s;}
+.unit-card:hover{transform:translateY(-4px);box-shadow:0 14px 34px rgba(0,0,0,.4),var(--glow-pink);border-color:var(--pink);}
+.unit-card .tag{font-family:var(--f-title);font-size:8px;color:var(--green-soft);letter-spacing:1px;}
+.unit-card h3{font-family:var(--f-head);font-weight:800;font-size:19px;margin:6px 0;color:var(--white);}
+.unit-card .weight{position:absolute;top:12px;right:14px;font-family:var(--f-head);font-weight:800;
+  font-size:20px;color:var(--pink-soft);text-shadow:var(--glow-pink);}
+.unit-card p{font-size:13px;color:var(--ink-dim);margin:6px 0 10px;line-height:1.5;}
+.mini-bar{height:9px;border-radius:20px;background:rgba(0,0,0,.35);overflow:hidden;}
+.mini-bar > i{display:block;height:100%;width:0%;border-radius:20px;
+  background:linear-gradient(90deg,var(--green),var(--purple));transition:width .5s;}
+.mini-pct{font-family:var(--f-head);font-weight:700;font-size:11px;color:var(--green-soft);margin-top:4px;}
+
+/* checklist + section bar */
+.section-block{margin:8px 0 22px;}
+.section-bar-shell{height:22px;border-radius:30px;background:rgba(0,0,0,.4);border:1.5px solid var(--card-line);
+  overflow:hidden;position:relative;margin:6px 0;}
+.section-bar-fill{height:100%;width:0%;border-radius:30px;transition:width .5s cubic-bezier(.2,.9,.2,1);
+  background:linear-gradient(90deg,var(--pink),var(--purple) 60%,var(--green));background-size:200% 100%;
+  animation:shimmer 3s linear infinite;box-shadow:0 0 10px rgba(72,255,192,.5);}
+.section-bar-shell .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-head);font-weight:800;font-size:12px;color:var(--white);text-shadow:0 1px 3px #000;}
+.section-bar-shell.done{box-shadow:0 0 18px var(--green);}
+.complete-badge{display:inline-block;margin-left:8px;font-family:var(--f-title);font-size:9px;color:var(--green);
+  opacity:0;transform:scale(.5);transition:.4s;}
+.complete-badge.show{opacity:1;transform:scale(1);animation:pop .5s;}
+@keyframes pop{0%{transform:scale(.4) rotate(-8deg);}60%{transform:scale(1.25) rotate(4deg);}100%{transform:scale(1) rotate(0);}}
+
+.task-group-title{font-family:var(--f-head);font-weight:700;color:var(--green-soft);font-size:14px;margin:14px 0 4px;
+  text-transform:uppercase;letter-spacing:1px;}
+ul.checklist{list-style:none;padding:0;margin:0;}
+ul.checklist li{display:flex;align-items:flex-start;gap:11px;padding:9px 10px;margin:5px 0;border-radius:13px;
+  background:rgba(20,8,46,.4);border:1px solid rgba(255,159,232,.14);cursor:pointer;transition:.16s;}
+ul.checklist li:hover{background:rgba(255,79,216,.12);border-color:var(--card-line);}
+.box{flex:0 0 24px;width:24px;height:24px;border-radius:8px;border:2.5px solid var(--purple-soft);
+  background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;transition:.2s;margin-top:1px;}
+.box svg{width:14px;height:14px;opacity:0;transform:scale(.3);transition:.25s;}
+li.checked .box{background:linear-gradient(135deg,var(--pink),var(--green));border-color:var(--green);box-shadow:var(--glow-green);}
+li.checked .box svg{opacity:1;transform:scale(1);}
+li.checked .ttext{color:var(--ink-dim);text-decoration:line-through;text-decoration-color:var(--pink-soft);}
+.ttext{font-size:14px;line-height:1.45;}
+.ttext .kind{font-family:var(--f-title);font-size:7px;letter-spacing:.5px;padding:2px 5px;border-radius:6px;margin-right:7px;
+  vertical-align:middle;}
+.k-learn{background:rgba(168,107,255,.3);color:var(--purple-pastel);}
+.k-read{background:rgba(72,255,192,.22);color:var(--green-pastel);}
+.k-lab{background:rgba(255,79,216,.3);color:var(--pink-pastel);}
+.k-quiz{background:rgba(255,209,102,.25);color:#ffe8a8;}
+.k-drill{background:rgba(255,255,255,.18);color:#fff;}
+
+/* resource list */
+.res{display:flex;gap:11px;align-items:flex-start;padding:11px;border-radius:13px;margin:8px 0;
+  background:rgba(20,8,46,.45);border:1px solid var(--card-line);transition:.18s;text-decoration:none;color:var(--ink);}
+.res:hover{transform:translateX(4px);border-color:var(--green);box-shadow:var(--glow-green);}
+.res .ri{font-size:22px;flex:0 0 auto;}
+.res b{color:var(--white);font-family:var(--f-head);font-size:15px;}
+.res small{display:block;color:var(--ink-dim);font-size:12.5px;margin-top:2px;line-height:1.4;}
+.res .free{font-family:var(--f-title);font-size:7px;color:var(--green);margin-left:6px;}
+.res .paid{font-family:var(--f-title);font-size:7px;color:var(--pink-soft);margin-left:6px;}
+
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--f-head);font-weight:700;font-size:14px;
+  padding:10px 18px;border-radius:14px;border:2px solid var(--pink);background:rgba(255,79,216,.16);
+  color:var(--white);cursor:pointer;text-decoration:none;transition:.18s;margin:4px 6px 4px 0;}
+.btn:hover{transform:translateY(-2px);box-shadow:var(--glow-pink);background:rgba(255,79,216,.3);}
+.btn.green{border-color:var(--green);background:rgba(72,255,192,.14);}
+.btn.green:hover{box-shadow:var(--glow-green);}
+.back{font-family:var(--f-head);font-weight:700;color:var(--green-soft);cursor:pointer;font-size:14px;margin-bottom:6px;display:inline-block;}
+.back:hover{color:var(--white);}
+
+/* tables */
+table.kw{width:100%;border-collapse:collapse;margin:10px 0;font-size:13px;}
+table.kw th,table.kw td{border:1px solid var(--card-line);padding:7px 9px;text-align:left;}
+table.kw th{background:rgba(168,107,255,.22);font-family:var(--f-head);color:var(--white);}
+table.kw td{background:rgba(20,8,46,.35);}
+.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--f-head);}
+.pill.p{background:rgba(255,79,216,.25);color:var(--pink-pastel);}
+.pill.g{background:rgba(72,255,192,.2);color:var(--green-pastel);}
+.pill.u{background:rgba(168,107,255,.25);color:var(--purple-pastel);}
+
+.callout{border-left:4px solid var(--green);background:rgba(72,255,192,.08);padding:12px 14px;border-radius:0 14px 14px 0;margin:14px 0;font-size:13.5px;line-height:1.55;}
+.callout.pink{border-color:var(--pink);background:rgba(255,79,216,.08);}
+
+/* ---------------- CALENDAR --------------- */
+.cal-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;}
+.cal-toolbar .seg{display:flex;background:rgba(20,8,46,.5);border:1.5px solid var(--card-line);border-radius:14px;overflow:hidden;}
+.cal-toolbar .seg button{font-family:var(--f-head);font-weight:700;font-size:13px;padding:8px 14px;border:none;
+  background:transparent;color:var(--ink-dim);cursor:pointer;transition:.15s;}
+.cal-toolbar .seg button.active{background:linear-gradient(90deg,var(--pink),var(--purple));color:#fff;}
+.cal-nav{margin-left:auto;display:flex;gap:6px;align-items:center;}
+.cal-nav button{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--purple);background:rgba(45,22,86,.6);
+  color:var(--green-soft);font-size:16px;cursor:pointer;}
+.cal-title{font-family:var(--f-head);font-weight:800;font-size:16px;color:var(--white);}
+
+.month-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.dow{font-family:var(--f-title);font-size:8px;color:var(--green-soft);text-align:center;padding:4px 0;}
+.day-cell{min-height:74px;border-radius:12px;border:1.5px solid rgba(255,159,232,.18);padding:5px 6px;
+  background:rgba(20,8,46,.4);cursor:pointer;transition:.15s;overflow:hidden;position:relative;}
+.day-cell:hover{border-color:var(--pink);transform:scale(1.03);z-index:2;box-shadow:var(--glow-pink);}
+.day-cell.empty{background:transparent;border:none;cursor:default;}
+.day-cell .dn{font-family:var(--f-head);font-weight:800;font-size:15px;color:var(--white);}
+.day-cell .dlabel{font-size:9.5px;line-height:1.25;color:var(--ink-dim);margin-top:2px;}
+.day-cell .dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;}
+.dot.pink{background:var(--pink);box-shadow:var(--glow-pink);}
+.dot.purple{background:var(--purple);box-shadow:var(--glow-purple);}
+.dot.green{background:var(--green);box-shadow:var(--glow-green);}
+.day-cell.today{outline:2px solid var(--green);}
+.day-cell.examday{background:linear-gradient(135deg,rgba(255,79,216,.4),rgba(72,255,192,.3));border-color:var(--pink);}
+
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.week-col{background:rgba(20,8,46,.4);border:1.5px solid var(--card-line);border-radius:12px;padding:7px;min-height:120px;}
+.week-col h4{font-family:var(--f-head);margin:0 0 4px;font-size:12px;color:var(--green-soft);}
+.week-col .wd{font-family:var(--f-head);font-weight:800;font-size:16px;color:var(--white);}
+.week-col ul{list-style:none;padding:0;margin:6px 0 0;}
+.week-col li{font-size:10.5px;padding:3px 5px;margin:3px 0;border-radius:7px;background:rgba(168,107,255,.18);line-height:1.3;}
+
+.day-view{margin-top:6px;}
+.hour-row{display:flex;gap:8px;align-items:stretch;border-top:1px solid rgba(255,159,232,.12);padding:2px 0;}
+.hour-row .hr{flex:0 0 64px;font-family:var(--f-head);font-weight:700;font-size:12px;color:var(--green-soft);padding-top:8px;text-align:right;}
+.slot{flex:1;min-height:34px;border-radius:10px;padding:7px 10px;cursor:text;font-size:13px;transition:.15s;
+  background:rgba(20,8,46,.35);border:1px dashed transparent;display:flex;align-items:center;}
+.slot:hover{background:rgba(255,79,216,.1);border-color:var(--card-line);}
+.slot.study{background:rgba(168,107,255,.22);border:1px solid rgba(168,107,255,.4);font-weight:600;color:var(--white);}
+.slot.life{background:rgba(72,255,192,.12);color:var(--green-pastel);}
+.slot.empty-slot{color:#7a679a;font-style:italic;}
+.slot input{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--green);border-radius:8px;color:#fff;
+  font-family:var(--f-body);font-size:13px;padding:5px 8px;}
+
+/* ---------------- CELEBRATION OVERLAY --------------- */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden;}
+.conf{position:absolute;top:-20px;width:11px;height:11px;border-radius:3px;animation:fall linear forwards;}
+@keyframes fall{to{transform:translateY(108vh) rotate(720deg);}}
+#celebrate{position:fixed;inset:0;z-index:95;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(circle at center,rgba(80,20,120,.55),rgba(10,4,24,.85));backdrop-filter:blur(3px);}
+#celebrate.show{display:flex;animation:fadein .4s;}
+@keyframes fadein{from{opacity:0;}to{opacity:1;}}
+#celebrate .box{text-align:center;padding:30px;}
+#celebrate h2{font-family:var(--f-title);font-size:clamp(18px,5vw,34px);color:var(--white);
+  text-shadow:0 0 14px var(--pink),0 0 28px var(--purple);animation:wob 1s ease-in-out infinite;}
+@keyframes wob{0%,100%{transform:rotate(-3deg) scale(1);}50%{transform:rotate(3deg) scale(1.06);}}
+#celebrate p{font-family:var(--f-head);font-size:18px;color:var(--green-soft);margin-top:14px;}
+#celebrate .close{margin-top:22px;}
+
+/* toast */
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(120px);z-index:80;
+  background:rgba(30,15,66,.95);border:2px solid var(--green);border-radius:16px;padding:12px 20px;
+  font-family:var(--f-head);font-weight:700;color:var(--white);box-shadow:var(--glow-green);transition:.4s;max-width:90vw;text-align:center;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+code.kbd{background:rgba(0,0,0,.5);border:1px solid var(--card-line);border-radius:6px;padding:1px 7px;
+  font-family:var(--f-title);font-size:10px;color:var(--green-soft);}
+.foot{font-size:11px;color:#7a679a;text-align:center;margin-top:24px;font-family:var(--f-head);}
+hr.sep{border:none;border-top:1px dashed var(--card-line);margin:18px 0;}
+</style>
+</head>
+<body>
+<div id="bg"></div><div id="grid"></div><div id="stars"></div>
+
+<!-- hamburger + nav -->
+<div id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+<nav id="nav"></nav>
+<button id="mute" onclick="toggleMute()" title="Sound on/off">🔊</button>
+
+<header>
+  <!-- study buddy robot -->
+  <svg id="robot" viewBox="0 0 100 100" aria-label="study buddy robot">
+    <line x1="50" y1="14" x2="50" y2="4" stroke="#48ffc0" stroke-width="3"/>
+    <circle cx="50" cy="4" r="4" fill="#ff4fd8"/>
+    <rect x="22" y="14" width="56" height="48" rx="16" fill="#2a1556" stroke="#ff9fe8" stroke-width="3"/>
+    <rect x="30" y="26" width="40" height="22" rx="11" fill="#0e0524"/>
+    <circle class="robot-eye" cx="42" cy="37" r="5" fill="#48ffc0"/>
+    <circle class="robot-eye" cx="58" cy="37" r="5" fill="#48ffc0"/>
+    <path d="M44 44 q6 5 12 0" stroke="#ff4fd8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="30" cy="40" rx="4" ry="3" fill="rgba(255,79,216,.5)"/>
+    <ellipse cx="70" cy="40" rx="4" ry="3" fill="rgba(255,79,216,.5)"/>
+    <rect x="30" y="64" width="40" height="22" rx="9" fill="#3a1d6b" stroke="#c6a4ff" stroke-width="3"/>
+    <rect x="38" y="70" width="24" height="4" rx="2" fill="#48ffc0"/>
+    <rect x="38" y="77" width="16" height="4" rx="2" fill="#ff9fe8"/>
+  </svg>
+  <h1 id="title" data-text="NeTwOrK+">NeTwOrK+</h1>
+  <p class="subtitle">// CompTIA Network+ N10-009 · Sprint to June 30 💾</p>
+  <div id="master-wrap">
+    <div id="master-bar-shell"><div id="master-bar-fill"></div></div>
+    <div id="master-label">Overall mission progress: <b id="master-pct">0%</b> · <span id="master-count">0 / 0</span> tasks</div>
+  </div>
+</header>
+
+<div id="shell"><div id="content"></div></div>
+
+<div id="confetti"></div>
+<div id="celebrate"><div class="box">
+  <h2 id="cel-title">YOU DID IT!</h2>
+  <p id="cel-msg"></p>
+  <button class="btn green close" onclick="hideCelebrate()">yatta! 🎉 close</button>
+</div></div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   DATA — units mapped from the Codecademy syllabus + CompTIA N10-009 domains
+   ============================================================ */
+const PM_INDEX="https://www.professormesser.com/network-plus/n10-009/n10-009-video/n10-009-training-course/";
+const PM_HUB="https://www.professormesser.com/get-network-plus-certified/";
+const COMPTIA="https://www.comptia.org/en-us/certifications/network/";
+const EXAMCOMPASS="https://www.examcompass.com/comptia/network-plus-certification";
+const PACKETTRACER="https://www.netacad.com/courses/packet-tracer";
+const ANKI="https://apps.ankiweb.net/";
+const REDDIT="https://www.reddit.com/r/CompTIA/";
+const SUBNET="https://subnettingpractice.com/";
+
+const UNITS=[
+{
+  id:"u1",tag:"DOMAIN 1.0",weight:"23%",color:"pink",
+  title:"Networking Concepts",
+  blurb:"The foundation: OSI model, devices, ports & protocols, topologies, cloud, IPv4 addressing & subnetting, and modern environments (SDN/SD-WAN/SASE/Zero Trust).",
+  codecademy:["The OSI Reference Model","Networking Appliances, Applications & Functions","Cloud Computing Concepts","Ports & Protocols","Network Topologies, Architectures & Types","IPv4 Network Addressing","Modern Network Environments"],
+  tasks:[
+    {g:"Learn (watch + take notes)",items:[
+      {id:"u1-l1",k:"learn",t:"Professor Messer 1.1 — OSI 7-layer model (know each layer + a real example)"},
+      {id:"u1-l2",k:"learn",t:"1.2 — Networking devices: switch, router, firewall, AP, load balancer, proxy, IDS/IPS"},
+      {id:"u1-l3",k:"learn",t:"1.4 — Ports, protocols & traffic types (unicast/multicast/anycast/broadcast)"},
+      {id:"u1-l4",k:"learn",t:"1.6 — Topologies & network types (star, mesh, hybrid, LAN/WAN/SAN/PAN)"},
+      {id:"u1-l5",k:"learn",t:"1.7 — IPv4 addressing: classes, private ranges, CIDR, subnet masks"},
+      {id:"u1-l6",k:"learn",t:"1.8 — Cloud + modern networks: SDN, SD-WAN, SASE/SSE, Zero Trust, IaC, VXLAN"},
+    ]},
+    {g:"Read",items:[
+      {id:"u1-r1",k:"read",t:"Download the official CompTIA N10-009 objectives PDF — read all of Domain 1.0"},
+      {id:"u1-r2",k:"read",t:"OSI vs TCP/IP model side-by-side; map common protocols to layers"},
+    ]},
+    {g:"Drill (memorize)",items:[
+      {id:"u1-d1",k:"drill",t:"Memorize OSI layers with a mnemonic (e.g. 'Please Do Not Throw Sausage Pizza Away')"},
+      {id:"u1-d2",k:"drill",t:"Memorize the port-number table on the Memory & Tips page (FTP→DNS→HTTPS→RDP…)"},
+      {id:"u1-d3",k:"drill",t:"⭐ Daily subnetting drills — 10 questions/day until it's automatic"},
+    ]},
+    {g:"Lab (hands-on)",items:[
+      {id:"u1-lab1",k:"lab",t:"Install Wireshark; capture traffic and identify protocols + OSI layers live"},
+      {id:"u1-lab2",k:"lab",t:"Subnet 5 networks by hand: find network ID, broadcast, host range, # of hosts"},
+    ]},
+    {g:"Quiz",items:[
+      {id:"u1-q1",k:"quiz",t:"ExamCompass Domain 1 practice questions — score 80%+ before moving on"},
+      {id:"u1-q2",k:"quiz",t:"Professor Messer pop-quiz set for Networking Concepts"},
+    ]},
+  ],
+  resources:[
+    {i:"🎬",b:"Professor Messer — Domain 1 videos",s:"Watch sections 1.1–1.8. The #1 free resource and it maps to every Codecademy module here.",u:PM_INDEX,free:1},
+    {i:"📄",b:"Official CompTIA N10-009 Objectives PDF",s:"Your master checklist. Download from the CompTIA cert page and tick objectives as you cover them.",u:COMPTIA,free:1},
+    {i:"🧮",b:"Subnetting practice generator",s:"Endless subnetting questions with answers. Do these EVERY day — subnetting shows up a lot.",u:SUBNET,free:1},
+    {i:"🦈",b:"Wireshark",s:"Free packet analyzer. Seeing real packets makes the OSI model finally click.",u:"https://www.wireshark.org/",free:1},
+    {i:"📝",b:"ExamCompass free practice tests",s:"Free, objective-aligned question banks for every domain.",u:EXAMCOMPASS,free:1},
+  ]
+},
+{
+  id:"u2",tag:"DOMAIN 2.0",weight:"20%",color:"purple",
+  title:"Network Implementation",
+  blurb:"Deploy & configure: routing technologies, switching (VLANs, STP, port security), wireless standards & security, and physical installation (cabling, racks, transceivers).",
+  codecademy:["Routing & Switching Technologies","Wireless Configurations & Physical Installations"],
+  tasks:[
+    {g:"Learn",items:[
+      {id:"u2-l1",k:"learn",t:"2.1 — Routing: static vs dynamic, default routes, OSPF / BGP / EIGRP basics, NAT/PAT"},
+      {id:"u2-l2",k:"learn",t:"2.2 — Switching: VLANs, trunking (802.1Q), STP, port security, link aggregation"},
+      {id:"u2-l3",k:"learn",t:"2.3 — Wireless: 802.11 standards, 2.4 vs 5 vs 6 GHz, channels, WPA2/WPA3, SSID"},
+      {id:"u2-l4",k:"learn",t:"2.4 — Physical: copper vs fiber, cable categories, connectors, transceivers, racks"},
+    ]},
+    {g:"Read",items:[
+      {id:"u2-r1",k:"read",t:"CompTIA objectives Domain 2.0 — note cable categories & max distances"},
+    ]},
+    {g:"Drill",items:[
+      {id:"u2-d1",k:"drill",t:"Memorize cable types: Cat5e/6/6a/7/8 speeds & distances; SC/LC/ST connectors"},
+      {id:"u2-d2",k:"drill",t:"Continue daily subnetting (don't stop!) + VLAN concept flashcards"},
+    ]},
+    {g:"Lab",items:[
+      {id:"u2-lab1",k:"lab",t:"Cisco Packet Tracer: build 2 VLANs + inter-VLAN routing on a router-on-a-stick"},
+      {id:"u2-lab2",k:"lab",t:"Packet Tracer: configure a wireless AP with WPA2 and connect a client"},
+    ]},
+    {g:"Quiz",items:[
+      {id:"u2-q1",k:"quiz",t:"ExamCompass Domain 2 questions — 80%+"},
+      {id:"u2-q2",k:"quiz",t:"Do a PBQ-style VLAN/routing simulation"},
+    ]},
+  ],
+  resources:[
+    {i:"🎬",b:"Professor Messer — Domain 2 videos",s:"Sections 2.1–2.4 cover routing, switching, wireless and physical installs.",u:PM_INDEX,free:1},
+    {i:"🛠️",b:"Cisco Packet Tracer",s:"Free network simulator (sign up for the free 'Getting Started' course). Best way to practice config + PBQs.",u:PACKETTRACER,free:1},
+    {i:"📄",b:"CompTIA Objectives — Domain 2",s:"Use the cable-type and wireless-standard tables as memorization targets.",u:COMPTIA,free:1},
+    {i:"📝",b:"ExamCompass — Implementation set",s:"Free practice questions for routing, switching & wireless.",u:EXAMCOMPASS,free:1},
+  ]
+},
+{
+  id:"u3",tag:"DOMAIN 3.0",weight:"19%",color:"purple",
+  title:"Network Operations",
+  blurb:"Run the network: documentation & processes, monitoring (SNMP/syslog/NetFlow), disaster recovery (RTO/RPO, HA), IPv4/IPv6 services (DHCP/DNS/NTP), and access methods.",
+  codecademy:["Organizational Processes & Procedures","Network Monitoring & Disaster Recovery Concepts","Network Management & IP Services"],
+  tasks:[
+    {g:"Learn",items:[
+      {id:"u3-l1",k:"learn",t:"3.1 — Processes: documentation, diagrams, change/config mgmt, SLAs, IPAM"},
+      {id:"u3-l2",k:"learn",t:"3.2 — Monitoring: SNMP, syslog, NetFlow, log review, baselines, SIEM"},
+      {id:"u3-l3",k:"learn",t:"3.3 — Disaster recovery: RTO/RPO, backups, HA, redundancy, cold/warm/hot sites"},
+      {id:"u3-l4",k:"learn",t:"3.4 — IP services: DHCP, DNS records, NTP, IPv6; 3.5 access (SSH, VPN, console, jump box, API)"},
+    ]},
+    {g:"Read",items:[
+      {id:"u3-r1",k:"read",t:"CompTIA objectives Domain 3.0 — focus on DNS record types & DHCP process (DORA)"},
+    ]},
+    {g:"Drill",items:[
+      {id:"u3-d1",k:"drill",t:"Memorize DNS record types (A, AAAA, CNAME, MX, TXT, PTR, NS, SOA, SRV)"},
+      {id:"u3-d2",k:"drill",t:"Memorize DHCP DORA steps + RTO vs RPO vs MTTR vs MTBF"},
+    ]},
+    {g:"Lab",items:[
+      {id:"u3-lab1",k:"lab",t:"Packet Tracer / home router: configure a DHCP scope and reservations"},
+      {id:"u3-lab2",k:"lab",t:"Use nslookup/dig to query A, MX, and CNAME records for a real domain"},
+    ]},
+    {g:"Quiz",items:[
+      {id:"u3-q1",k:"quiz",t:"ExamCompass Domain 3 questions — 80%+"},
+    ]},
+  ],
+  resources:[
+    {i:"🎬",b:"Professor Messer — Domain 3 videos",s:"Sections 3.1–3.5: monitoring tools, DR, DHCP/DNS, and remote access methods.",u:PM_INDEX,free:1},
+    {i:"📄",b:"CompTIA Objectives — Domain 3",s:"DNS record types and the DHCP process are high-yield. Make flashcards from this section.",u:COMPTIA,free:1},
+    {i:"🃏",b:"Anki (spaced repetition)",s:"Free flashcard app. Build decks for ports, DNS records, acronyms — review 15 min daily.",u:ANKI,free:1},
+    {i:"📝",b:"ExamCompass — Operations set",s:"Free monitoring / DR / IP-services practice questions.",u:EXAMCOMPASS,free:1},
+  ]
+},
+{
+  id:"u4",tag:"DOMAIN 4.0",weight:"14%",color:"green",
+  title:"Network Security",
+  blurb:"Defend the network: CIA & Zero Trust, defense-in-depth, AAA, NAC, segmentation; common attacks (DoS/DDoS, on-path, spoofing, VLAN hopping, social engineering); and security features.",
+  codecademy:["Network Security Concepts & Solutions","Common Network Attack Types"],
+  tasks:[
+    {g:"Learn",items:[
+      {id:"u4-l1",k:"learn",t:"4.1 — Security concepts: CIA triad, Zero Trust, AAA, defense-in-depth, least privilege"},
+      {id:"u4-l2",k:"learn",t:"4.2 — Attacks: DoS/DDoS, on-path (MITM), ARP/DNS/MAC spoofing, VLAN hopping, rogue AP"},
+      {id:"u4-l3",k:"learn",t:"4.2 — Social engineering: phishing, pretexting, tailgating, dumpster diving"},
+      {id:"u4-l4",k:"learn",t:"4.3 — Security features: ACLs, port security, 802.1X, firewalls, IDS/IPS, NAC, segmentation"},
+    ]},
+    {g:"Read",items:[
+      {id:"u4-r1",k:"read",t:"CompTIA objectives Domain 4.0 — match each attack to its defense"},
+    ]},
+    {g:"Drill",items:[
+      {id:"u4-d1",k:"drill",t:"Flashcards: attack → mitigation pairs (e.g. ARP spoofing → DHCP snooping/DAI)"},
+    ]},
+    {g:"Lab",items:[
+      {id:"u4-lab1",k:"lab",t:"Packet Tracer: enable port security on a switch (sticky MAC, max addresses)"},
+      {id:"u4-lab2",k:"lab",t:"Write a simple firewall ACL ruleset (allow/deny by IP, port, direction)"},
+    ]},
+    {g:"Quiz",items:[
+      {id:"u4-q1",k:"quiz",t:"ExamCompass Domain 4 questions — 80%+"},
+    ]},
+  ],
+  resources:[
+    {i:"🎬",b:"Professor Messer — Domain 4 videos",s:"Sections 4.1–4.3: security concepts, attack types, and hardening/defense techniques.",u:PM_INDEX,free:1},
+    {i:"📄",b:"CompTIA Objectives — Domain 4",s:"Build an 'attack → mitigation' table; the exam loves matching these.",u:COMPTIA,free:1},
+    {i:"📝",b:"ExamCompass — Security set",s:"Free practice questions on attacks & defenses.",u:EXAMCOMPASS,free:1},
+  ]
+},
+{
+  id:"u5",tag:"DOMAIN 5.0",weight:"24%",color:"pink",
+  title:"Network Troubleshooting",
+  blurb:"The biggest domain. The 7-step methodology, cabling & interface issues, command-line tools (ping/traceroute/dig/netstat…), performance issues, and choosing the right tool.",
+  codecademy:["Troubleshooting Methodologies & Approaches","Troubleshooting Cabling, Interfaces & Network Services","Troubleshooting Network Performance Issues","Solving Networking Issues"],
+  tasks:[
+    {g:"Learn",items:[
+      {id:"u5-l1",k:"learn",t:"5.1 — ⭐ The 7-step troubleshooting methodology (MEMORIZE the order, it's tested directly)"},
+      {id:"u5-l2",k:"learn",t:"5.2 — Cabling/interface issues: attenuation, crosstalk, TX/RX reversed, bad cables, CRC errors"},
+      {id:"u5-l3",k:"learn",t:"5.3 — Service issues: DHCP exhaustion, DNS failures, duplicate IPs, gateway problems"},
+      {id:"u5-l4",k:"learn",t:"5.4 — Performance: latency, jitter, bottlenecks, bandwidth, interference"},
+      {id:"u5-l5",k:"learn",t:"5.5 — Tools: ping, traceroute/tracert, ipconfig/ifconfig/ip, nslookup/dig, netstat, arp, tcpdump"},
+    ]},
+    {g:"Read",items:[
+      {id:"u5-r1",k:"read",t:"CompTIA objectives Domain 5.0 — make a 'symptom → tool → fix' cheat sheet"},
+    ]},
+    {g:"Drill",items:[
+      {id:"u5-d1",k:"drill",t:"Memorize the 7 troubleshooting steps in order + when to escalate"},
+      {id:"u5-d2",k:"drill",t:"Match each CLI tool to what it diagnoses (flashcards)"},
+    ]},
+    {g:"Lab",items:[
+      {id:"u5-lab1",k:"lab",t:"Run every CLI tool on your own machine; document what each output means"},
+      {id:"u5-lab2",k:"lab",t:"Do 10+ troubleshooting PBQs / simulations (this domain is heavy on PBQs)"},
+    ]},
+    {g:"Quiz",items:[
+      {id:"u5-q1",k:"quiz",t:"ExamCompass Domain 5 questions — 85%+ (this is 24% of the exam!)"},
+      {id:"u5-q2",k:"quiz",t:"Timed scenario questions — practice picking the BEST next step"},
+    ]},
+  ],
+  resources:[
+    {i:"🎬",b:"Professor Messer — Domain 5 videos",s:"Sections 5.1–5.5. Highest-weight domain (24%) — rewatch the methodology + tools twice.",u:PM_INDEX,free:1},
+    {i:"💻",b:"Your own terminal",s:"Free lab: run ping, tracert, ipconfig /all, nslookup, netstat -an, arp -a and study each output.",u:"",free:1},
+    {i:"📄",b:"CompTIA Objectives — Domain 5",s:"Turn 5.5 into a tool-by-tool cheat sheet — exactly what each command diagnoses.",u:COMPTIA,free:1},
+    {i:"📝",b:"ExamCompass — Troubleshooting set",s:"Free scenario questions. Focus here — it's the largest scored domain.",u:EXAMCOMPASS,free:1},
+  ]
+},
+{
+  id:"u6",tag:"FINAL SPRINT",weight:"GO!",color:"green",
+  title:"Final Review & Practice Exams",
+  blurb:"Tie it all together. Full-length timed practice exams, weak-area review, PBQ rehearsal, a subnetting/ports speed test, scheduling your exam, and an exam-day checklist.",
+  codecademy:["Take the Practice Exam","Schedule your Exam","Upload Certification","Practice Lab (optional)"],
+  tasks:[
+    {g:"Practice exams",items:[
+      {id:"u6-e1",k:"quiz",t:"Full 90-question / 90-minute timed practice exam #1 — log every wrong objective"},
+      {id:"u6-e2",k:"quiz",t:"Targeted review of every missed objective from exam #1"},
+      {id:"u6-e3",k:"quiz",t:"Full timed practice exam #2 — aim for 85%+ (real pass is 720/900 ≈ 80%)"},
+      {id:"u6-e4",k:"quiz",t:"Practice 10–15 PBQs (drag-drop, simulations) under time pressure"},
+    ]},
+    {g:"Speed drills",items:[
+      {id:"u6-d1",k:"drill",t:"Subnetting speed test: 10 questions in under 10 minutes"},
+      {id:"u6-d2",k:"drill",t:"Ports & DNS records flash-recall: under 2 minutes each"},
+    ]},
+    {g:"Logistics",items:[
+      {id:"u6-x1",k:"read",t:"Schedule the exam (target ~June 26–28 to leave buffer before the June 30 voucher expiry)"},
+      {id:"u6-x2",k:"read",t:"Confirm test center / online proctor system check + ID requirements"},
+      {id:"u6-x3",k:"read",t:"Read the exam-day checklist on the Memory & Tips page the night before"},
+      {id:"u6-x4",k:"read",t:"After passing: upload your certification to complete the Codecademy path 🎉"},
+    ]},
+  ],
+  resources:[
+    {i:"📝",b:"ExamCompass full practice tests",s:"Free, repeatable, objective-tagged. Use for both timed exams.",u:EXAMCOMPASS,free:1},
+    {i:"🎬",b:"Professor Messer practice exams & pop quizzes",s:"Free pop-quiz archive + monthly live study group Q&A.",u:PM_HUB,free:1},
+    {i:"🧪",b:"Dion Training practice exams (Udemy)",s:"Well-regarded full-length practice exams with explanations.",u:"https://www.udemy.com/",paid:1},
+    {i:"👥",b:"r/CompTIA community",s:"Recent test-taker tips, 'I passed' notes, and what to focus on. Great morale boost.",u:REDDIT,free:1},
+  ]
+},
+];
+
+/* ============================================================
+   30-DAY STUDY PLAN (June 2026) — drives the calendar
+   ============================================================ */
+const PLAN={};
+function setRange(a,b,o){for(let d=a;d<=b;d++)PLAN[d]=o;}
+setRange(1,6,{u:"u1",label:"Unit 1 · Networking Concepts",color:"pink",
+  focus:["Subnetting drill (15m) + review","OSI model & networking devices","Ports / protocols / traffic types","Topologies, IPv4 addressing & subnetting"]});
+PLAN[7]={u:"u1",label:"Unit 1 Review + Quiz",color:"pink",
+  focus:["Subnetting drill","Re-watch weak Domain 1 topics","ExamCompass Domain 1 quiz","Anki flashcards"]};
+setRange(8,12,{u:"u2",label:"Unit 2 · Implementation",color:"purple",
+  focus:["Subnetting drill","Routing & switching (VLANs/STP)","Wireless standards & security","Packet Tracer lab"]});
+PLAN[13]={u:"review",label:"Review U1–U2 + Mini Exam",color:"green",
+  focus:["Subnetting timed drill","Mixed Domain 1–2 questions","Review every miss","Light flashcards"]};
+setRange(14,18,{u:"u3",label:"Unit 3 · Operations",color:"purple",
+  focus:["Subnetting drill","Monitoring (SNMP/syslog/NetFlow)","DR + DHCP/DNS/NTP","nslookup/dig lab"]});
+setRange(19,21,{u:"u4",label:"Unit 4 · Security",color:"green",
+  focus:["Subnetting drill","Security concepts & Zero Trust","Attack types → mitigations","Port-security / ACL lab"]});
+setRange(22,25,{u:"u5",label:"Unit 5 · Troubleshooting (BIG)",color:"pink",
+  focus:["Subnetting drill","7-step methodology (memorize)","CLI tools: ping/traceroute/dig…","Troubleshooting PBQs"]});
+PLAN[26]={u:"exam",label:"Full Practice Exam #1",color:"green",
+  focus:["90-min timed practice exam","Score & log weak objectives","Targeted review of misses"]};
+PLAN[27]={u:"exam",label:"Final Review + Practice Exam #2",color:"purple",
+  focus:["Practice exam #2","Subnetting + ports speed test","Light review only — rest your brain"]};
+PLAN[28]={u:"examday",label:"★ EXAM DAY (target) ★",color:"pink",
+  focus:["Light warm-up only (no cramming)","Arrive early / run system check","Breathe — you've got this 💖"]};
+PLAN[29]={u:"buffer",label:"Buffer / reschedule window",color:"green",
+  focus:["Rest day","Or retake prep if needed"]};
+PLAN[30]={u:"buffer",label:"⚠ Voucher deadline — last valid day",color:"pink",
+  focus:["Final day the voucher is valid","Must be tested by today"]};
+
+/* default daily 'life' template (editable in day view) */
+const LIFE={7:"☀️ Wake + breakfast",12:"🍜 Lunch break",15:"🌿 Break / short walk",
+  18:"🍽️ Dinner",21:"🃏 Anki flashcards (30 min)",22:"🌙 Wind down / sleep prep"};
+
+function defaultBlocksFor(day){
+  const p=PLAN[day]; const out={}; for(const h in LIFE)out[h]={t:LIFE[h],type:"life"};
+  if(p){
+    const f=p.focus||[];
+    if(f[0])out[8]={t:f[0],type:"study"};
+    if(f[1])out[9]={t:f[1]+" (study block 1)",type:"study"};
+    if(f[1])out[10]={t:f[1]+" — notes & examples",type:"study"};
+    if(f[2])out[13]={t:f[2]+" (study block 2)",type:"study"};
+    if(f[3])out[14]={t:f[3],type:"study"};
+    if(f[3]||f[2])out[16]={t:"Practice questions + review misses",type:"study"};
+  }
+  return out;
+}
+
+/* ============================================================
+   STATE + STORAGE
+   ============================================================ */
+const SKEY="netplus_state_v1", CKEY="netplus_cal_v1", MKEY="netplus_mute_v1";
+let checked=new Set(), calEdits={}, muted=false;
+function load(){
+  try{const s=JSON.parse(localStorage.getItem(SKEY)||"[]");checked=new Set(s);}catch(e){}
+  try{calEdits=JSON.parse(localStorage.getItem(CKEY)||"{}");}catch(e){calEdits={};}
+  try{muted=localStorage.getItem(MKEY)==="1";}catch(e){}
+}
+function saveChecked(){try{localStorage.setItem(SKEY,JSON.stringify([...checked]));}catch(e){}}
+function saveCal(){try{localStorage.setItem(CKEY,JSON.stringify(calEdits));}catch(e){}}
+function allTasks(){let n=0;UNITS.forEach(u=>u.tasks.forEach(g=>n+=g.items.length));return n;}
+function unitTaskIds(u){let a=[];u.tasks.forEach(g=>g.items.forEach(i=>a.push(i.id)));return a;}
+function unitProgress(u){const ids=unitTaskIds(u);const c=ids.filter(i=>checked.has(i)).length;return{c,total:ids.length};}
+
+/* ============================================================
+   AUDIO (Web Audio API — generated, no files needed)
+   ============================================================ */
+let actx=null;
+function ensureAudio(){if(!actx){try{actx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}}if(actx&&actx.state==="suspended")actx.resume();}
+function tone(freq,start,dur,type="triangle",vol=0.18){
+  if(!actx||muted)return;const o=actx.createOscillator(),g=actx.createGain();
+  o.type=type;o.frequency.value=freq;o.connect(g);g.connect(actx.destination);
+  const t=actx.currentTime+start;g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(vol,t+0.012);g.gain.exponentialRampToValueAtTime(0.0008,t+dur);
+  o.start(t);o.stop(t+dur+0.02);
+}
+function playTick(){ensureAudio();if(!actx||muted)return;const f=620+Math.random()*180;tone(f,0,0.09,"square",0.10);tone(f*1.5,0.02,0.06,"sine",0.05);}
+function playSection(){ensureAudio();if(!actx||muted)return;[523,659,784,1047].forEach((f,i)=>tone(f,i*0.10,0.22,"triangle",0.16));tone(1568,0.42,0.4,"sine",0.10);}
+function playMaster(){ensureAudio();if(!actx||muted)return;
+  const seq=[523,587,659,784,880,1047,1319];seq.forEach((f,i)=>tone(f,i*0.11,0.25,"triangle",0.16));
+  [523,659,784,1047].forEach(f=>tone(f,0.85,0.9,"triangle",0.12)); // chord
+  tone(1568,0.9,1.0,"sine",0.10);tone(2093,1.0,0.8,"sine",0.07);}
+function toggleMute(){muted=!muted;try{localStorage.setItem(MKEY,muted?"1":"0");}catch(e){}
+  document.getElementById("mute").textContent=muted?"🔇":"🔊";}
+
+/* ============================================================
+   CELEBRATIONS
+   ============================================================ */
+const PAL=["#ff4fd8","#a86bff","#48ffc0","#ffffff","#ff9fe8","#c6a4ff","#8effd8"];
+function confetti(n,big){
+  const wrap=document.getElementById("confetti");
+  for(let i=0;i<n;i++){const c=document.createElement("div");c.className="conf";
+    c.style.left=Math.random()*100+"vw";c.style.background=PAL[i%PAL.length];
+    const dur=(big?2.4:1.6)+Math.random()*1.4;c.style.animationDuration=dur+"s";
+    c.style.animationDelay=Math.random()*(big?0.5:0.2)+"s";
+    const sz=(big?8:7)+Math.random()*8;c.style.width=sz+"px";c.style.height=sz+"px";
+    if(Math.random()>0.5)c.style.borderRadius="50%";
+    wrap.appendChild(c);setTimeout(()=>c.remove(),(dur+0.6)*1000);}
+}
+function showCelebrate(title,msg){
+  document.getElementById("cel-title").textContent=title;
+  document.getElementById("cel-msg").textContent=msg;
+  document.getElementById("celebrate").classList.add("show");
+  confetti(180,true);setTimeout(()=>confetti(120,true),700);
+}
+function hideCelebrate(){document.getElementById("celebrate").classList.remove("show");}
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._tmr);t._tmr=setTimeout(()=>t.classList.remove("show"),2600);}
+
+/* ============================================================
+   MASTER BAR
+   ============================================================ */
+let masterWasFull=false;
+function updateMaster(celebrate){
+  const total=allTasks(),c=checked.size,pct=total?Math.round(c/total*100):0;
+  document.getElementById("master-bar-fill").style.width=pct+"%";
+  document.getElementById("master-pct").textContent=pct+"%";
+  document.getElementById("master-count").textContent=c+" / "+total;
+  if(pct>=100&&!masterWasFull&&celebrate){masterWasFull=true;playMaster();
+    showCelebrate("YOU DID IT! ★","Every single task complete. You are 100% exam-ready — now go pass that Network+! 💖🤖");}
+  if(pct<100)masterWasFull=false;
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+const NAVLINKS=[
+  {p:"home",ico:"🏠",t:"Dashboard"},
+  {p:"plan",ico:"🗺️",t:"Lesson Plan"},
+  {head:"UNITS"},
+  {p:"u1",ico:"🌐",t:"1 · Concepts"},
+  {p:"u2",ico:"🔌",t:"2 · Implementation"},
+  {p:"u3",ico:"⚙️",t:"3 · Operations"},
+  {p:"u4",ico:"🛡️",t:"4 · Security"},
+  {p:"u5",ico:"🔧",t:"5 · Troubleshooting"},
+  {p:"u6",ico:"🏁",t:"Final Sprint"},
+  {head:"PLAN IT"},
+  {p:"calendar",ico:"📅",t:"Calendar"},
+  {p:"schedule",ico:"⏰",t:"Study Schedule"},
+  {p:"tips",ico:"🧠",t:"Memory & Tips"},
+  {p:"deploy",ico:"🚀",t:"Host on GitHub"},
+];
+function buildNav(){
+  const n=document.getElementById("nav");n.innerHTML="";
+  NAVLINKS.forEach(l=>{
+    if(l.head){const h=document.createElement("div");h.className="navhead";h.textContent=l.head;n.appendChild(h);return;}
+    const a=document.createElement("a");a.href="#"+l.p;a.dataset.page=l.p;
+    a.innerHTML='<span class="ico">'+l.ico+'</span>'+l.t;
+    a.onclick=(e)=>{e.preventDefault();go(l.p);closeNav();};n.appendChild(a);
+  });
+}
+function toggleNav(){document.getElementById("nav").classList.toggle("open");document.getElementById("hamburger").classList.toggle("open");}
+function closeNav(){document.getElementById("nav").classList.remove("open");document.getElementById("hamburger").classList.remove("open");}
+document.addEventListener("click",e=>{const nav=document.getElementById("nav"),hb=document.getElementById("hamburger");
+  if(nav.classList.contains("open")&&!nav.contains(e.target)&&!hb.contains(e.target))closeNav();});
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+function go(page){location.hash=page;}
+window.addEventListener("hashchange",route);
+function route(){const p=(location.hash||"#home").slice(1);render(p);
+  document.querySelectorAll("#nav a").forEach(a=>a.classList.toggle("active",a.dataset.page===p));
+  document.getElementById("content").scrollTop=0;}
+
+function render(page){
+  const c=document.getElementById("content");
+  if(page==="home")c.innerHTML=pageHome();
+  else if(page==="plan")c.innerHTML=pagePlan();
+  else if(page==="calendar"){c.innerHTML=pageCalendarShell();initCalendar();}
+  else if(page==="schedule")c.innerHTML=pageSchedule();
+  else if(page==="tips")c.innerHTML=pageTips();
+  else if(page==="deploy")c.innerHTML=pageDeploy();
+  else if(page.startsWith("u")&&UNITS.find(u=>u.id===page)){c.innerHTML=pageUnit(page);initUnit(page);}
+  else c.innerHTML=pageHome();
+}
+
+/* ============================================================
+   PAGE: HOME / DASHBOARD
+   ============================================================ */
+function daysLeft(){const now=new Date();const exam=new Date(2026,5,30,23,59);
+  return Math.max(0,Math.ceil((exam-now)/(1000*60*60*24)));}
+function pageHome(){
+  const total=allTasks();
+  let unitCards=UNITS.map(u=>{const pr=unitProgress(u);const pct=pr.total?Math.round(pr.c/pr.total*100):0;
+    return `<div class="unit-card" onclick="go('${u.id}')">
+      <span class="weight">${u.weight}</span>
+      <div class="tag">${u.tag}</div>
+      <h3>${u.title}</h3>
+      <div class="mini-bar"><i style="width:${pct}%"></i></div>
+      <div class="mini-pct">${pct}% · ${pr.c}/${pr.total} tasks</div>
+    </div>`;}).join("");
+  return `
+  <h2 class="page-title">Hi Alexa — let's get you certified 🤖💕</h2>
+  <p class="page-sub">Your 30-day sprint to the CompTIA Network+ N10-009. Voucher deadline: <b style="color:var(--pink-soft)">June 30, 2026</b>.</p>
+  <div class="grid two">
+    <div class="card" style="text-align:center;">
+      <div style="font-family:var(--f-title);font-size:9px;color:var(--green-soft);">DAYS UNTIL DEADLINE</div>
+      <div style="font-family:var(--f-head);font-weight:800;font-size:46px;color:var(--white);text-shadow:var(--glow-pink);">${daysLeft()}</div>
+      <div style="font-size:12px;color:var(--ink-dim);">Target your exam for ~June 26–28 to keep a safety buffer.</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-family:var(--f-title);font-size:9px;color:var(--green-soft);">TOTAL TASKS</div>
+      <div style="font-family:var(--f-head);font-weight:800;font-size:46px;color:var(--white);text-shadow:var(--glow-green);">${total}</div>
+      <div style="font-size:12px;color:var(--ink-dim);">Check them off → fill the bars → earn the confetti.</div>
+    </div>
+  </div>
+  <div class="callout">💡 <b>How this works:</b> open each unit, watch/read/lab/quiz, and tick the boxes. Each unit has its own progress bar with a reward when it fills. The big bar up top tracks <i>everything</i> — fill it 100% and you unlock the ultimate celebration. Everything saves on this device automatically.</div>
+  <h3 style="font-family:var(--f-head);color:var(--white);margin:18px 0 6px;">Your 6 sections</h3>
+  <div class="grid two">${unitCards}</div>
+  <div style="margin-top:18px;">
+    <a class="btn" onclick="go('plan')">🗺️ Lesson Plan</a>
+    <a class="btn green" onclick="go('calendar')">📅 Open Calendar</a>
+    <a class="btn" onclick="go('schedule')">⏰ Study Schedule</a>
+    <a class="btn green" onclick="go('tips')">🧠 Memory & Tips</a>
+  </div>
+  <p class="foot">Built with 💾 + 💖 · resources are free unless tagged PAID · always verify against the official CompTIA objectives.</p>`;
+}
+
+/* ============================================================
+   PAGE: LESSON PLAN
+   ============================================================ */
+function pagePlan(){
+  let cards=UNITS.map(u=>{const pr=unitProgress(u);const pct=pr.total?Math.round(pr.c/pr.total*100):0;
+    const cc=u.codecademy.map(x=>"• "+x).join("<br>");
+    return `<div class="unit-card" onclick="go('${u.id}')">
+      <span class="weight">${u.weight}</span>
+      <div class="tag">${u.tag}</div>
+      <h3>${u.title}</h3>
+      <p>${u.blurb}</p>
+      <div style="font-size:11px;color:var(--green-soft);font-family:var(--f-head);font-weight:700;margin-bottom:4px;">Codecademy modules:</div>
+      <div style="font-size:11.5px;color:var(--ink-dim);line-height:1.5;margin-bottom:10px;">${cc}</div>
+      <div class="mini-bar"><i style="width:${pct}%"></i></div>
+      <div class="mini-pct">${pct}% complete · tap to open →</div>
+    </div>`;}).join("");
+  return `
+  <h2 class="page-title">🗺️ Lesson Plan</h2>
+  <p class="page-sub">Your Codecademy syllabus mapped to the five CompTIA exam domains, ordered for the sprint. Tap any section for tasks + resources.</p>
+  <div class="callout pink">⚖️ <b>Time allocation follows exam weight.</b> Troubleshooting (24%) and Networking Concepts (23%) get the most time; Security (14%) the least. That's why the calendar gives Unit 5 four full days.</div>
+  <div class="grid two">${cards}</div>`;
+}
+
+/* ============================================================
+   PAGE: UNIT (section with checklist + bar + resources)
+   ============================================================ */
+function pageUnit(id){
+  const u=UNITS.find(x=>x.id===id);
+  let groups=u.tasks.map(g=>{
+    let lis=g.items.map(it=>{
+      const on=checked.has(it.id);
+      return `<li class="${on?'checked':''}" data-id="${it.id}" data-unit="${u.id}">
+        <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>
+        <span class="ttext"><span class="kind k-${it.k}">${it.k}</span>${it.t}</span>
+      </li>`;}).join("");
+    return `<div class="task-group-title">${g.g}</div><ul class="checklist">${lis}</ul>`;
+  }).join("");
+  let res=u.resources.map(r=>{
+    const tag=r.free?'<span class="free">FREE</span>':(r.paid?'<span class="paid">PAID</span>':'');
+    const open=r.u?`onclick="window.open('${r.u}','_blank')"`:'';
+    return `<a class="res" ${open} ${r.u?'':'style="cursor:default"'}>
+      <span class="ri">${r.i}</span>
+      <span><b>${r.b}${tag}</b><small>${r.s}</small></span></a>`;}).join("");
+  const pr=unitProgress(u),pct=pr.total?Math.round(pr.c/pr.total*100):0;
+  return `
+  <span class="back" onclick="go('plan')">← back to lesson plan</span>
+  <h2 class="page-title">${u.title}</h2>
+  <p class="page-sub">${u.tag} · ${u.weight} of the exam</p>
+  <p class="lead">${u.blurb}</p>
+  <div class="section-block">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-family:var(--f-head);font-weight:700;color:var(--green-soft);">Section progress</span>
+      <span class="complete-badge ${pct>=100?'show':''}" id="badge-${u.id}">✦ COMPLETE ✦</span>
+    </div>
+    <div class="section-bar-shell ${pct>=100?'done':''}" id="sbshell-${u.id}">
+      <div class="section-bar-fill" id="sbfill-${u.id}" style="width:${pct}%"></div>
+      <div class="pct" id="sbpct-${u.id}">${pct}%</div>
+    </div>
+  </div>
+  ${groups}
+  <hr class="sep">
+  <h3 style="font-family:var(--f-head);color:var(--white);margin:6px 0;">📚 Reinforce it — resources & links</h3>
+  <p style="font-size:12.5px;color:var(--ink-dim);margin-top:0;">Videos, the official objectives, labs, and practice for this section. (Opens in a new tab.)</p>
+  ${res}`;
+}
+function initUnit(id){
+  document.querySelectorAll('#content li[data-id]').forEach(li=>{
+    li.addEventListener("click",()=>toggleTask(li));
+  });
+}
+function toggleTask(li){
+  const id=li.dataset.id,uid=li.dataset.unit;
+  if(checked.has(id)){checked.delete(id);li.classList.remove("checked");}
+  else{checked.add(id);li.classList.add("checked");playTick();}
+  saveChecked();
+  const u=UNITS.find(x=>x.id===uid);const pr=unitProgress(u);const pct=pr.total?Math.round(pr.c/pr.total*100):0;
+  const fill=document.getElementById("sbfill-"+uid),pe=document.getElementById("sbpct-"+uid),
+        shell=document.getElementById("sbshell-"+uid),badge=document.getElementById("badge-"+uid);
+  if(fill){fill.style.width=pct+"%";pe.textContent=pct+"%";}
+  const wasDone=shell&&shell.classList.contains("done");
+  if(pct>=100){if(shell)shell.classList.add("done");if(badge)badge.classList.add("show");
+    if(!wasDone&&checked.has(id)){playSection();confetti(70,false);toast("✦ "+u.title+" complete! +"+pr.total+" tasks ✦");}}
+  else{if(shell)shell.classList.remove("done");if(badge)badge.classList.remove("show");}
+  // master last (so master celebration triggers after section)
+  updateMaster(true);
+  // refresh mini-bars implicitly when leaving — fine.
+}
+
+/* ============================================================
+   PAGE: CALENDAR  (month / week / day)
+   ============================================================ */
+let calView="month", calDay=1; // June day 1..30
+function pageCalendarShell(){
+  return `
+  <h2 class="page-title">📅 Study Calendar — June 2026</h2>
+  <p class="page-sub">Your whole sprint, mapped out. Month overview, weekly focus, and an editable hourly day plan. Tap any day to zoom in; tap any hour to edit.</p>
+  <div class="cal-toolbar">
+    <div class="seg">
+      <button id="v-month" onclick="setView('month')">Month</button>
+      <button id="v-week" onclick="setView('week')">Week</button>
+      <button id="v-day" onclick="setView('day')">Day</button>
+    </div>
+    <div class="cal-nav">
+      <button onclick="calStep(-1)">‹</button>
+      <span class="cal-title" id="cal-title"></span>
+      <button onclick="calStep(1)">›</button>
+    </div>
+  </div>
+  <div id="cal-body"></div>`;
+}
+function initCalendar(){const t=new Date();if(t.getFullYear()===2026&&t.getMonth()===5)calDay=t.getDate();setView(calView);}
+function setView(v){calView=v;["month","week","day"].forEach(x=>{const b=document.getElementById("v-"+x);if(b)b.classList.toggle("active",x===v);});
+  if(v==="month")renderMonth();else if(v==="week")renderWeek();else renderDay();}
+function calStep(dir){
+  if(calView==="day")calDay=Math.min(30,Math.max(1,calDay+dir));
+  else if(calView==="week")calDay=Math.min(30,Math.max(1,calDay+dir*7));
+  setView(calView);
+}
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+function dateStr(day){return "2026-06-"+String(day).padStart(2,"0");}
+function renderMonth(){
+  document.getElementById("cal-title").textContent="June 2026";
+  const first=new Date(2026,5,1).getDay();
+  let cells="";DOW.forEach(d=>cells+=`<div class="dow">${d}</div>`);
+  for(let i=0;i<first;i++)cells+=`<div class="day-cell empty"></div>`;
+  const today=new Date();const todayD=(today.getFullYear()===2026&&today.getMonth()===5)?today.getDate():-1;
+  for(let d=1;d<=30;d++){const p=PLAN[d];const cls=[p&&p.u==="examday"?"examday":"",d===todayD?"today":""].join(" ");
+    cells+=`<div class="day-cell ${cls}" onclick="openDay(${d})">
+      <div class="dn">${d}</div>
+      ${p?`<span class="dot ${p.color}"></span><div class="dlabel">${p.label}</div>`:""}
+    </div>`;}
+  document.getElementById("cal-body").innerHTML=`<div class="month-grid">${cells}</div>
+   <div class="callout" style="margin-top:14px;">🌸 Pink = Concepts/Troubleshooting weeks · 💜 Purple = Implementation/Operations · 💚 Green = review & exams. Tap a day to plan the hours.</div>`;
+}
+function openDay(d){calDay=d;setView("day");}
+function weekStart(day){const dow=new Date(2026,5,day).getDay();return Math.max(1,day-dow);}
+function renderWeek(){
+  const start=weekStart(calDay);
+  document.getElementById("cal-title").textContent="Week of June "+start;
+  let cols="";
+  for(let i=0;i<7;i++){const d=start+i;if(d>30){cols+=`<div class="week-col" style="opacity:.3"></div>`;continue;}
+    const p=PLAN[d];const dow=new Date(2026,5,d).getDay();
+    let items=p?p.focus.map(f=>`<li>${f}</li>`).join(""):"<li>—</li>";
+    cols+=`<div class="week-col" onclick="openDay(${d})" style="cursor:pointer">
+      <h4>${DOW[dow]}</h4><div class="wd">${d}</div>
+      <div style="font-size:10px;color:var(--pink-soft);font-weight:700;margin:2px 0 2px;">${p?p.label:""}</div>
+      <ul>${items}</ul></div>`;}
+  document.getElementById("cal-body").innerHTML=`<div class="week-grid">${cols}</div>
+    <div class="callout" style="margin-top:14px;">Tap any day to open the hour-by-hour editable plan. Use ‹ › to move between weeks.</div>`;
+}
+function renderDay(){
+  const d=calDay;const dow=new Date(2026,5,d).getDay();const p=PLAN[d];
+  document.getElementById("cal-title").textContent=DOW[dow]+", June "+d;
+  const def=defaultBlocksFor(d);const edits=calEdits[dateStr(d)]||{};
+  let rows="";
+  for(let h=6;h<=23;h++){
+    const hr=(h%12===0?12:h%12)+(h<12?"a":"p");
+    let txt="",type="empty-slot";
+    if(edits[h]!==undefined){txt=edits[h];type=def[h]?def[h].type:"study";if(txt==="")type="empty-slot";}
+    else if(def[h]){txt=def[h].t;type=def[h].type;}
+    rows+=`<div class="hour-row"><div class="hr">${hr}</div>
+      <div class="slot ${type}" data-h="${h}" onclick="editSlot(${d},${h},this)">${txt||"+ add"}</div></div>`;
+  }
+  document.getElementById("cal-body").innerHTML=`
+    <div style="font-family:var(--f-head);font-weight:800;color:var(--pink-soft);margin-bottom:4px;">${p?p.label:"Open day"}</div>
+    <div style="font-size:12px;color:var(--ink-dim);margin-bottom:8px;">Pre-filled with your plan. Click any hour to edit — changes save automatically. 💜 = study block, 💚 = life block.</div>
+    <div class="day-view">${rows}</div>`;
+}
+function editSlot(day,h,el){
+  const cur=el.textContent==="+ add"?"":el.textContent;
+  el.innerHTML=`<input type="text" value="${cur.replace(/"/g,'&quot;')}" />`;
+  const inp=el.querySelector("input");inp.focus();inp.select();
+  const save=()=>{const v=inp.value.trim();
+    if(!calEdits[dateStr(day)])calEdits[dateStr(day)]={};
+    calEdits[dateStr(day)][h]=v;saveCal();renderDay();};
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter")save();if(e.key==="Escape")renderDay();});
+  inp.addEventListener("blur",save);
+}
+
+/* ============================================================
+   PAGE: STUDY SCHEDULE
+   ============================================================ */
+function pageSchedule(){
+  return `
+  <h2 class="page-title">⏰ The 30-Day Accelerated Schedule</h2>
+  <p class="page-sub">A realistic sprint from base-level to exam-ready. Roughly 3–4 focused hours/day on weekdays, more on weekends. Adjust the hourly blocks on the Calendar to fit your life.</p>
+
+  <div class="callout pink">🎯 <b>The strategy:</b> One pass through each domain (watch → read → lab → quiz), heaviest time on the heaviest domains, <b>daily subnetting drills throughout</b>, then two full timed practice exams before test day. Exam target: <b>June 26–28</b>, with June 29–30 as buffer.</div>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);">Week-by-week</h3>
+  <table class="kw">
+    <tr><th>Dates</th><th>Focus</th><th>Goal</th></tr>
+    <tr><td><span class="pill p">Jun 1–7</span></td><td>Unit 1 · Networking Concepts (23%)</td><td>OSI, ports, IPv4 + start subnetting daily. Quiz Day 7.</td></tr>
+    <tr><td><span class="pill u">Jun 8–13</span></td><td>Unit 2 · Implementation (20%) + mini-review</td><td>Routing, switching, wireless, Packet Tracer labs. Mixed exam Day 13.</td></tr>
+    <tr><td><span class="pill u">Jun 14–18</span></td><td>Unit 3 · Operations (19%)</td><td>Monitoring, DR, DHCP/DNS, access methods.</td></tr>
+    <tr><td><span class="pill g">Jun 19–21</span></td><td>Unit 4 · Security (14%)</td><td>Concepts, attacks → mitigations, security features.</td></tr>
+    <tr><td><span class="pill p">Jun 22–25</span></td><td>Unit 5 · Troubleshooting (24% — biggest)</td><td>Methodology, CLI tools, lots of PBQs.</td></tr>
+    <tr><td><span class="pill g">Jun 26–27</span></td><td>Final Sprint · 2 full practice exams</td><td>Score 85%+, review every miss.</td></tr>
+    <tr><td><span class="pill p">Jun 28</span></td><td>★ Exam day (target)</td><td>Light warm-up only. Pass it!</td></tr>
+    <tr><td><span class="pill g">Jun 29–30</span></td><td>Buffer</td><td>Reschedule room before voucher expires.</td></tr>
+  </table>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);margin-top:18px;">A typical study day (editable template)</h3>
+  <table class="kw">
+    <tr><th>Time</th><th>Block</th></tr>
+    <tr><td>8:00–8:15</td><td>⭐ Subnetting drill (10 questions) + 5-min review of yesterday</td></tr>
+    <tr><td>9:00–11:00</td><td>Study block 1 — Professor Messer videos + take notes</td></tr>
+    <tr><td>11:00–11:15</td><td>Break ☕</td></tr>
+    <tr><td>11:15–12:30</td><td>Hands-on lab (Packet Tracer / Wireshark / CLI)</td></tr>
+    <tr><td>13:30–15:00</td><td>Study block 2 — reading + practice questions</td></tr>
+    <tr><td>15:30–16:30</td><td>Quiz the section, review every wrong answer</td></tr>
+    <tr><td>21:00–21:30</td><td>🃏 Anki flashcards (spaced repetition)</td></tr>
+  </table>
+  <div class="callout">🧩 Open the <a class="inline" onclick="go('calendar')">Calendar → Day view</a> to see this pre-filled for every date and edit any hour to match your real schedule (work, class, appointments).</div>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);margin-top:18px;">Non-negotiables</h3>
+  <ul class="checklist" style="pointer-events:none;">
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">Subnetting EVERY day — even 10 minutes. It's the #1 thing people lose points on.</span></li>
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">Always review your <i>wrong</i> answers — that's where the real learning is.</span></li>
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">Do hands-on labs, don't just watch. PBQs are ~25% of your score.</span></li>
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">Sleep before the exam &gt; cramming. A rested brain recalls more.</span></li>
+  </ul>`;
+}
+
+/* ============================================================
+   PAGE: MEMORY & TIPS
+   ============================================================ */
+function pageTips(){
+  return `
+  <h2 class="page-title">🧠 Memory & Exam Tips</h2>
+  <p class="page-sub">High-yield things to memorize cold, plus how to actually make them stick — and how to win on exam day.</p>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);">The OSI model (memorize the order)</h3>
+  <table class="kw">
+    <tr><th>#</th><th>Layer</th><th>Remember it as</th><th>Example</th></tr>
+    <tr><td>7</td><td>Application</td><td><b>A</b>way</td><td>HTTP, DNS, FTP</td></tr>
+    <tr><td>6</td><td>Presentation</td><td><b>P</b>izza</td><td>TLS/SSL, encoding</td></tr>
+    <tr><td>5</td><td>Session</td><td><b>S</b>ausage</td><td>session setup/teardown</td></tr>
+    <tr><td>4</td><td>Transport</td><td><b>T</b>hrow</td><td>TCP, UDP, ports</td></tr>
+    <tr><td>3</td><td>Network</td><td><b>N</b>ot</td><td>IP, routers, ICMP</td></tr>
+    <tr><td>2</td><td>Data Link</td><td><b>D</b>o</td><td>MAC, switches, frames</td></tr>
+    <tr><td>1</td><td>Physical</td><td><b>P</b>lease</td><td>cables, signals</td></tr>
+  </table>
+  <div class="callout">Top-down mnemonic: <b>"All People Seem To Need Data Processing"</b> · bottom-up: <b>"Please Do Not Throw Sausage Pizza Away."</b></div>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);margin-top:16px;">High-yield ports to memorize</h3>
+  <table class="kw">
+    <tr><th>Port</th><th>Service</th><th>Port</th><th>Service</th></tr>
+    <tr><td>20/21</td><td>FTP</td><td>143</td><td>IMAP</td></tr>
+    <tr><td>22</td><td>SSH / SFTP / SCP</td><td>161/162</td><td>SNMP</td></tr>
+    <tr><td>23</td><td>Telnet</td><td>389</td><td>LDAP</td></tr>
+    <tr><td>25</td><td>SMTP</td><td>443</td><td>HTTPS</td></tr>
+    <tr><td>53</td><td>DNS</td><td>445</td><td>SMB</td></tr>
+    <tr><td>67/68</td><td>DHCP</td><td>514</td><td>Syslog</td></tr>
+    <tr><td>69</td><td>TFTP</td><td>636</td><td>LDAPS</td></tr>
+    <tr><td>80</td><td>HTTP</td><td>993</td><td>IMAP (secure)</td></tr>
+    <tr><td>110</td><td>POP3</td><td>995</td><td>POP3 (secure)</td></tr>
+    <tr><td>123</td><td>NTP</td><td>3389</td><td>RDP</td></tr>
+  </table>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);margin-top:16px;">The 7 troubleshooting steps (tested directly!)</h3>
+  <table class="kw">
+    <tr><th>#</th><th>Step</th></tr>
+    <tr><td>1</td><td>Identify the problem</td></tr>
+    <tr><td>2</td><td>Establish a theory of probable cause</td></tr>
+    <tr><td>3</td><td>Test the theory to determine cause</td></tr>
+    <tr><td>4</td><td>Establish a plan of action</td></tr>
+    <tr><td>5</td><td>Implement the solution (or escalate)</td></tr>
+    <tr><td>6</td><td>Verify full system functionality (+ preventive measures)</td></tr>
+    <tr><td>7</td><td>Document findings, actions & outcomes</td></tr>
+  </table>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);margin-top:16px;">Subnetting fast method</h3>
+  <div class="callout pink">Memorize the "magic number" rule: subtract the mask octet from 256 to get your block size. /26 = 255.255.255.<b>192</b> → 256−192 = <b>64</b> → networks at .0, .64, .128, .192. Practice this until it's reflex (see the subnetting site on Unit 1).</div>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);margin-top:16px;">How to actually memorize (the science)</h3>
+  <div class="card">
+    <b style="font-family:var(--f-head);color:var(--green-soft);">Spaced repetition</b> — review material at growing intervals (1 day, 3 days, 1 week). Use <a class="inline" onclick="window.open('${ANKI}','_blank')">Anki</a> for ports, acronyms, DNS records.<br><br>
+    <b style="font-family:var(--f-head);color:var(--green-soft);">Active recall</b> — close your notes and write down everything you remember, THEN check. Far stronger than re-reading.<br><br>
+    <b style="font-family:var(--f-head);color:var(--green-soft);">Teach it</b> — explain a concept out loud as if teaching someone. Gaps in your understanding become obvious instantly.<br><br>
+    <b style="font-family:var(--f-head);color:var(--green-soft);">Interleave</b> — mix topics in a study session instead of one big block; it improves retention and mirrors the real exam.
+  </div>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);margin-top:16px;">Exam-day checklist</h3>
+  <ul class="checklist" style="pointer-events:none;">
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">90 questions in 90 minutes ≈ 1 min each. Flag hard ones and move on — don't get stuck.</span></li>
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">PBQs appear first and eat time — consider flagging them, doing the multiple-choice, then returning.</span></li>
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">Read the question's LAST line first — it tells you what's actually being asked.</span></li>
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">Bring two forms of ID. Passing score is 720/900. Results are instant.</span></li>
+    <li class="checked"><span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#0e0524" stroke-width="4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg></span><span class="ttext">Eat, hydrate, sleep. Confidence is a skill — you've prepared, trust it. 💖</span></li>
+  </ul>
+  <p class="foot">Always confirm details (ports, steps, weights) against the official CompTIA N10-009 objectives — they're the source of truth.</p>`;
+}
+
+/* ============================================================
+   PAGE: DEPLOY TO GITHUB PAGES
+   ============================================================ */
+function pageDeploy(){
+  return `
+  <h2 class="page-title">🚀 Host this on GitHub Pages</h2>
+  <p class="page-sub">This whole site is one file (<code class="kbd">index.html</code>). Getting it online is quick and free.</p>
+
+  <div class="card">
+    <b style="font-family:var(--f-head);color:var(--green-soft);font-size:16px;">The 5-minute path</b>
+    <ol style="line-height:1.8;font-size:14px;margin-top:8px;">
+      <li>Sign in to <a class="inline" onclick="window.open('https://github.com','_blank')">github.com</a> (free account).</li>
+      <li>Click <b>New repository</b>. Name it something like <code class="kbd">networkplus</code>. Set it <b>Public</b>. Create it.</li>
+      <li>On the repo page click <b>Add file → Upload files</b>, and drag in this <code class="kbd">index.html</code>. Commit.</li>
+      <li>Go to <b>Settings → Pages</b>. Under "Build and deployment", set <b>Source = Deploy from a branch</b>, branch <b>main</b>, folder <b>/ (root)</b>. Save.</li>
+      <li>Wait ~1 minute, then visit <code class="kbd">https://YOURNAME.github.io/networkplus/</code> 🎉</li>
+    </ol>
+  </div>
+
+  <div class="callout">💾 <b>About saving:</b> your checklist progress and calendar edits are stored in this browser (localStorage), so they persist on the device + browser you use. They won't sync between devices yet.</div>
+
+  <div class="callout pink">🔐 <b>"Log in from anywhere" later:</b> when you're ready, the cleanest free upgrade is to keep this front-end on GitHub Pages and add a small backend for sync. Easiest options: <b>Firebase Auth + Firestore</b> (Google login + cloud save, generous free tier) or <b>Supabase</b> (open-source, similar). Either lets you replace the localStorage calls with cloud reads/writes so progress follows you across devices. That's a follow-up project — the current version works great solo for your June sprint.</div>
+
+  <h3 style="font-family:var(--f-head);color:var(--white);">Want to edit content?</h3>
+  <p class="lead" style="font-size:14px;">All tasks, resources, and the calendar plan live in clearly-labeled data arrays near the top of the <code class="kbd">&lt;script&gt;</code> (look for <code class="kbd">UNITS</code> and <code class="kbd">PLAN</code>). Add/remove tasks there and the bars recalculate automatically. Ask me anytime and I can adjust it for you.</p>
+  <p class="foot">Tip: if fonts or styling look plain in a preview, that's just because Google Fonts need internet — they'll load fine once it's on GitHub Pages.</p>`;
+}
+
+/* ============================================================
+   STARS + BOOT
+   ============================================================ */
+function makeStars(){const s=document.getElementById("stars");for(let i=0;i<26;i++){const e=document.createElement("div");
+  e.className="star";e.style.left=Math.random()*100+"vw";e.style.top=Math.random()*100+"vh";
+  e.style.animationDelay=Math.random()*3+"s";e.style.background=PAL[i%PAL.length];s.appendChild(e);}}
+document.body.addEventListener("pointerdown",ensureAudio,{once:true});
+(function boot(){
+  load();makeStars();buildNav();
+  document.getElementById("mute").textContent=muted?"🔇":"🔊";
+  if(!location.hash)location.hash="home";
+  route();updateMaster(false);
+})();
+</script>
+</body>
+</html>
