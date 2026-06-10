@@ -340,11 +340,44 @@ table.kw td{background:rgba(20,8,46,.35);}
 .ns-row.ns-break .ns-slot{background:rgba(72,255,192,.13);color:var(--green-pastel);}
 .ns-row.ns-fuel .ns-slot{background:rgba(255,79,216,.14);color:var(--pink-pastel);}
 .ns-row.ns-rest .ns-slot{background:rgba(120,90,200,.2);color:var(--purple-pastel);font-style:italic;}
+.ns-row.ns-quiz .ns-slot{background:rgba(255,196,79,.16);border:1px solid rgba(255,196,79,.4);color:#ffe7b0;font-weight:600;}
+.ns-row.ns-review .ns-slot{background:rgba(72,255,192,.16);border:1px solid rgba(72,255,192,.4);color:var(--green-pastel);font-weight:600;}
 .ns-slot input{width:100%;background:rgba(0,0,0,.45);border:1px solid var(--green);border-radius:8px;color:#fff;
   font-family:var(--f-body);font-size:12.5px;padding:5px 8px;}
 
 .ns-sprk{position:fixed;z-index:120;pointer-events:none;font-size:14px;animation:nsSprk .9s ease-out forwards;}
 @keyframes nsSprk{0%{opacity:1;transform:translateY(0) scale(.6);}100%{opacity:0;transform:translateY(-28px) scale(1.3);}}
+
+/* night sprint — hour adjuster */
+.ns-adjust{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:0 0 12px;padding:8px 12px;border-radius:14px;position:relative;z-index:1;
+  background:rgba(20,8,46,.4);border:1.5px solid var(--card-line);font-family:var(--f-head);font-weight:700;font-size:13px;color:var(--green-soft);}
+.ns-adj-grp{display:flex;align-items:center;gap:6px;}
+.ns-adj-grp b{min-width:56px;text-align:center;color:var(--white);font-size:14px;}
+.ns-adj-grp button{width:30px;height:30px;border-radius:9px;border:1.5px solid var(--purple);background:rgba(45,22,86,.6);color:var(--green-soft);font-size:15px;cursor:pointer;transition:.15s;}
+.ns-adj-grp button:hover{background:rgba(168,107,255,.3);transform:scale(1.08);}
+
+/* night sprint — full plan (text-heavy) view */
+.ns-doc{position:relative;z-index:1;}
+.ns-doc-goal{border-radius:14px;padding:12px 14px;margin:6px 0 12px;line-height:1.55;font-size:13.5px;
+  background:linear-gradient(120deg,rgba(255,79,216,.16),rgba(168,107,255,.16));border:1.5px solid var(--pink);}
+.ns-doc-sec{display:flex;align-items:baseline;gap:10px;margin:20px 0 8px;padding-bottom:5px;border-bottom:2px solid rgba(168,107,255,.4);}
+.ns-doc-sec span{font-family:var(--f-title);font-size:11px;color:var(--pink-soft);text-shadow:0 0 8px rgba(255,79,216,.4);}
+.ns-doc-sec small{font-family:var(--f-head);font-weight:700;color:var(--green-soft);font-size:11px;margin-left:auto;}
+.ns-card{background:rgba(20,8,46,.45);border:1.5px solid rgba(255,159,232,.2);border-left:4px solid var(--purple);border-radius:12px;padding:10px 13px;margin:8px 0;}
+.ns-card-h{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px;}
+.ns-card-h b{font-family:var(--f-head);font-size:15px;color:var(--white);}
+.ns-chip{font-family:var(--f-head);font-weight:800;font-size:11px;color:var(--bg0);background:var(--green-soft);padding:2px 9px;border-radius:20px;white-space:nowrap;}
+.ns-obj{font-family:var(--f-head);font-weight:700;font-size:10.5px;color:var(--purple-pastel);background:rgba(168,107,255,.25);padding:2px 8px;border-radius:20px;}
+.ns-card ul,.ns-card ol{margin:4px 0 0;padding-left:18px;}
+.ns-card li{font-size:12.5px;line-height:1.5;margin:3px 0;color:var(--ink);}
+.ns-card code{background:rgba(0,0,0,.4);border:1px solid var(--card-line);border-radius:6px;padding:1px 6px;font-size:11.5px;color:var(--green-soft);}
+.ns-card-quiz{border-left-color:#ffc44f;}
+.ns-card-review{border-left-color:var(--green);}
+.ns-card-rest{border-left-color:var(--purple-soft);}
+.ns-card-cov{border-left-color:var(--pink);}
+.ns-doc-break{font-size:12px;color:var(--ink-dim);margin:4px 0 4px 8px;}
+.ns-bigbreak{font-size:13px;}
+.ns-sleepnote{margin-top:8px;padding:8px 10px;border-radius:10px;background:rgba(72,255,192,.1);border-left:3px solid var(--green);font-size:12px;line-height:1.5;color:var(--green-pastel);}
 
 /* ---------------- CELEBRATION OVERLAY --------------- */
 #confetti{position:fixed;inset:0;pointer-events:none;z-index:90;overflow:hidden;}
@@ -1053,18 +1086,23 @@ function defaultBlocksFor(day){
    STATE + STORAGE
    ============================================================ */
 const SKEY="netplus_state_v1", CKEY="netplus_cal_v1", MKEY="netplus_mute_v1",
-      NSKEY="netplus_night_v1", NMKEY="netplus_night_mode_v1";
-let checked=new Set(), calEdits={}, muted=false, nightEdits={}, nightMode="suggested";
+      NSKEY="netplus_night_v1", NMKEY="netplus_night_mode_v1",
+      NSTARTKEY="netplus_night_start_v1", NHOURSKEY="netplus_night_hours_v1";
+let checked=new Set(), calEdits={}, muted=false, nightEdits={}, nightMode="timeline";
+let NIGHT_START=22, NIGHT_HOURS=8;   // 10 PM, 8 hourly sections (adjustable in the UI)
 function load(){
   try{const s=JSON.parse(localStorage.getItem(SKEY)||"[]");checked=new Set(s);}catch(e){}
   try{calEdits=JSON.parse(localStorage.getItem(CKEY)||"{}");}catch(e){calEdits={};}
   try{muted=localStorage.getItem(MKEY)==="1";}catch(e){}
   try{nightEdits=JSON.parse(localStorage.getItem(NSKEY)||"{}");}catch(e){nightEdits={};}
-  try{nightMode=localStorage.getItem(NMKEY)||"suggested";}catch(e){nightMode="suggested";}
+  try{nightMode=localStorage.getItem(NMKEY)||"timeline";if(nightMode==="suggested")nightMode="timeline";}catch(e){nightMode="timeline";}
+  try{const v=parseInt(localStorage.getItem(NSTARTKEY));if(!isNaN(v))NIGHT_START=((v%24)+24)%24;}catch(e){}
+  try{const v=parseInt(localStorage.getItem(NHOURSKEY));if(!isNaN(v))NIGHT_HOURS=Math.min(16,Math.max(1,v));}catch(e){}
 }
 function saveChecked(){try{localStorage.setItem(SKEY,JSON.stringify([...checked]));}catch(e){}}
 function saveCal(){try{localStorage.setItem(CKEY,JSON.stringify(calEdits));}catch(e){}}
 function saveNight(){try{localStorage.setItem(NSKEY,JSON.stringify(nightEdits));}catch(e){}}
+function saveNightCfg(){try{localStorage.setItem(NSTARTKEY,NIGHT_START);localStorage.setItem(NHOURSKEY,NIGHT_HOURS);}catch(e){}}
 function allTasks(){let n=0;UNITS.forEach(u=>u.tasks.forEach(g=>n+=g.items.length));return n;}
 function unitTaskIds(u){let a=[];u.tasks.forEach(g=>g.items.forEach(i=>a.push(i.id)));return a;}
 function unitProgress(u){const ids=unitTaskIds(u);const c=ids.filter(i=>checked.has(i)).length;return{c,total:ids.length};}
@@ -1408,44 +1446,122 @@ function editSlot(day,h,el){
 /* ============================================================
    PAGE: NIGHT SPRINT  (editable 5-minute night planner)
    ============================================================ */
-const NIGHT_START=18;   // first hour shown = 6:00 PM
-const NIGHT_HOURS=8;    // 8 hours → ends ~2:00 AM
-const NIGHT_EMOJI={18:"🌆",19:"🌇",20:"🌃",21:"🌙",22:"⭐",23:"🌌",0:"🦉",1:"💤",2:"🌙",3:"🌌",4:"🌅",5:"☀️"};
-const NS_STUDY=["🧠 Deep focus block","🌐 Subnetting drill","🔌 Ports & protocols","🛡️ Security concepts",
-  "🔧 Troubleshooting PBQs","📡 OSI model recall","🃏 Anki flashcards","🧪 Packet Tracer lab",
-  "🗺️ Topology sketch","🔢 IPv4 / CIDR math"];
-const NS_CONT=["↳ stay in focus 💜","↳ keep going ✍️","↳ in the zone 🎯","↳ deep work 🧠"];
-const NS_BREAK=["🌿 Stretch + water","💃 Dance break!","🫧 Deep breaths","🐱 Pet the cat",
-  "🎧 Lo-fi reset","👀 Eyes off screen","🪟 Gaze out the window","🧸 Quick cuddle"];
-const NS_FUEL=["☕ Tea + snack refuel","🍫 Brain-fuel snack","🍜 Midnight noodles","🧃 Hydrate + treat"];
+const NIGHT_EMOJI={18:"🌆",19:"🌇",20:"🌃",21:"🌙",22:"⭐",23:"🌌",0:"🦉",1:"💤",2:"🌙",3:"🌌",4:"🌅",5:"☀️",6:"🌞",7:"☕"};
 const NS_VIBES={study:{e:"💜",cls:"ns-study"},break:{e:"💚",cls:"ns-break"},fuel:{e:"☕",cls:"ns-fuel"},
-  rest:{e:"💤",cls:"ns-rest"},open:{e:"✨",cls:"ns-open"}};
+  rest:{e:"💤",cls:"ns-rest"},quiz:{e:"📝",cls:"ns-quiz"},review:{e:"🔍",cls:"ns-review"},open:{e:"✨",cls:"ns-open"}};
 const NS_ORDER=["study","break","fuel","rest","open"];
+
+/* The real Unit-1 night-sprint plan — single source for BOTH the 5-min grid
+   (micro labels, one per block) and the text-heavy Full Plan view (bullets). */
+const NIGHT_DETAIL=[
+ {sec:"BLOCK 1 — Foundations"},
+ {t:"study",title:"OSI Model",obj:"1.1",
+   bullets:["Watch Messer <b>1.1</b> OSI 7-layer (or Codecademy OSI video).",
+            "Active recall: write all 7 layers + 1 real example each. Mnemonic: <i>Please Do Not Throw Sausage Pizza Away</i>.",
+            "Lock: what each layer does, encapsulation vs decapsulation, which devices/protocols live where."],
+   micro:["📺 Messer 1.1 — OSI 7 layers","✍️ Write all 7 layers + 1 example each","🧠 Please Do Not Throw Sausage Pizza Away","🔁 Encapsulation vs decapsulation","📍 Devices/protocols per layer"]},
+ {t:"break",micro:["🚻 Bathroom + 💧 water"]},
+ {t:"study",title:"Appliances & Functions",obj:"1.2",
+   bullets:["Messer <b>1.2</b> networking devices.",
+            "Notes, each mapped to an OSI layer: router · switch · firewall · IDS vs IPS · load balancer · proxy · NAS vs SAN · AP vs controller · CDN · VPN · QoS · TTL.",
+            "Checkpoint: CertMaster <b>1.1.8 Lesson Review: Networking Overview</b>."],
+   micro:["📺 Messer 1.2 — networking devices","🧭 Router · switch · firewall · IDS/IPS","⚖️ Load balancer · proxy · NAS vs SAN","📡 AP/controller · CDN · VPN · QoS · TTL","✅ CertMaster 1.1.8 Lesson Review"]},
+ {t:"break",micro:["🧍 Stand + 20-20-20 (look 20ft, 20s)"]},
+ {t:"study",title:"Ports & Protocols",obj:"1.4",
+   bullets:["Drill the port table cold (Memory &amp; Tips page + Messer 1.4): 20/21 FTP · 22 SSH/SFTP · 23 Telnet · 25 SMTP · 53 DNS · 67/68 DHCP · 69 TFTP · 80 HTTP · 123 NTP · 161/162 SNMP · 389 LDAP · 443 HTTPS · 445 SMB · 514 Syslog · 587 SMTPS · 636 LDAPS · 1433 SQL · 3389 RDP · 5060/5061 SIP.",
+            "IP types: ICMP · TCP · UDP · GRE · IPSec (AH / ESP / IKE). Traffic types: unicast · multicast · anycast · broadcast.",
+            "Active recall: cover the table, recite. Nail TCP vs UDP."],
+   micro:["🔢 20/21 FTP·22 SSH·23 Telnet·25 SMTP","🔢 53 DNS·67/68 DHCP·80 HTTP·123 NTP","🔢 161/2 SNMP·389 LDAP·443 HTTPS·445 SMB·3389 RDP","📦 ICMP·TCP·UDP·GRE·IPSec (AH/ESP/IKE)","🗣️ Uni/multi/any/broadcast · TCP vs UDP"]},
+ {t:"break",micro:["🍪 Grab a snack"]},
+ {t:"study",title:"IPv4 Addressing fundamentals",obj:"1.7a",
+   bullets:["Read CertMaster <b>4.2 IPv4 Addressing</b> + Messer 1.7.",
+            "Lock: classes A/B/C/D/E · private RFC1918 (10/8, 172.16/12, 192.168/16) · APIPA (169.254/16) · loopback (127/8) · default gateway · broadcast.",
+            "Checkpoint: CertMaster <b>4.2.12 Lesson Review: IPv4 Addressing</b>."],
+   micro:["📖 CertMaster 4.2 + Messer 1.7","🅰️ Classes A/B/C/D/E","🔒 RFC1918 · APIPA 169.254 · loopback 127","🚪 Default gateway · broadcast","✅ CertMaster 4.2.12 Lesson Review"]},
+ {t:"fuel",emoji:"🍔",title:"BIG BREAK 1",text:"Real food — it's midnight and you've got 4 hrs left. Then Pokopia / draw / timer tinkering if you want screen-off-ish time.",
+   micro:["🍔 BIG BREAK 1 — real food","🍔 It's midnight — refuel properly","🍔 Screen-off-ish: Pokopia / draw","🍔 ...or pomodoro-timer tinkering","🍔 Stretch a little","🍔 Back at 12:25 ⏰"]},
+
+ {sec:"BLOCK 2 — The hard yards"},
+ {t:"study",title:"Subnetting drills ⭐",obj:"1.7b",
+   bullets:["Skim CertMaster <b>4.3 IPv4 Subnetting</b> (CIDR, VLSM) + Messer subnetting.",
+            "Subnetting practice generator: <b>10 questions</b>. For each find: network ID · broadcast · host range · # of hosts."],
+   micro:["📖 CertMaster 4.3 — CIDR & VLSM ⭐","⭐ Subnet generator: Q1–Q3","⭐ Network ID + broadcast","⭐ Host range + # of hosts","⭐ Subnet generator: Q4–Q10"]},
+ {t:"break",micro:["💧 Water + stretch"]},
+ {t:"study",title:"Subnetting hands-on ⭐",obj:"1.7b",
+   bullets:["CertMaster <b>Lab 4.3.7: Configure IP Networks and Subnets</b>.",
+            "Then 5 more generator questions until it's reflex.",
+            "Checkpoint: CertMaster <b>4.3.8 Lesson Review: IPv4 Subnetting</b>."],
+   micro:["🧪 Lab 4.3.7 — IP Networks & Subnets ⭐","⭐ 5 more generator questions","⭐ Drill until it's reflex","⭐ Speed: network/broadcast/range","✅ CertMaster 4.3.8 Lesson Review"]},
+ {t:"break",micro:["🧍 Stand + 20-20-20"]},
+ {t:"study",title:"Topologies + Media/Transceivers",obj:"1.6 + 1.5",
+   bullets:["Messer <b>1.6</b> (topologies) + <b>1.5</b> (media/transceivers).",
+            "Topologies: mesh · hybrid · star/hub-spoke · spine-leaf · point-to-point · three-tier (core/distribution/access) · collapsed core · traffic flows (north-south vs east-west).",
+            "Media/connectors: 802.11 / 802.3 · single vs multimode fiber · DAC/twinax · coax · plenum · SFP/QSFP · SC/LC/ST/MPO/RJ11/RJ45/F-type/BNC.",
+            "Checkpoint: CertMaster <b>1.5 Module Quiz: Explaining Network Topologies</b>."],
+   micro:["📺 Messer 1.6 topologies + 1.5 media","🕸️ Mesh·star·spine-leaf·3-tier·collapsed core","↔️ North-south vs east-west traffic","🔌 SMF/MMF·DAC·coax·SFP/QSFP·LC/RJ45","✅ CertMaster 1.5 Module Quiz"]},
+ {t:"break",micro:["🚻 Bathroom + 💧 water"]},
+ {t:"study",title:"Cloud + Modern Networks",obj:"1.3 + 1.8",
+   bullets:["Read CertMaster <b>14.2 Cloud Concepts</b> + <b>14.4 Modern Network Environments</b>; Messer 1.8.",
+            "Cloud: NFV · VPC · security groups/lists · internet &amp; NAT gateways · connectivity (VPN, Direct Connect) · deployment (public/private/hybrid) · service models (IaaS/PaaS/SaaS) · scalability/elasticity/multitenancy.",
+            "Modern: SDN/SD-WAN (app-aware, zero-touch, transport-agnostic, central policy) · VXLAN (DCI, L2 encap) · ZTA (policy-based auth, least privilege) · SASE/SSE · IaC (playbooks, config drift, source control) · IPv6 (tunneling / dual stack / NAT64)."],
+   micro:["📖 CertMaster 14.2 Cloud + 14.4 Modern","☁️ NFV·VPC·security groups·gateways","☁️ IaaS/PaaS/SaaS·elasticity·multitenancy","🌐 SDN/SD-WAN·VXLAN·ZTA·SASE·IaC·IPv6","✅ CertMaster 14.2.6 / 14.4.9 Review"]},
+ {t:"fuel",emoji:"🥪",title:"BIG BREAK 2",text:"This is the 2:50 AM crash zone — lead with food + movement (stretch or short walk), not a screen-heavy game. Light timer tinkering is fine; save the long game session for after you pass.",
+   micro:["🥪 BIG BREAK 2 — food + movement","🥪 2:50 crash zone — eat real food","🥪 Stretch or a short walk 🚶","🥪 No heavy screen right now","🥪 Light timer tinkering ok","🥪 Back at 2:50 ⏰"]},
+
+ {sec:"REVIEW + QUIZ"},
+ {t:"study",title:"Targeted warm-up",obj:"review",
+   bullets:["Hit your two likely weak spots: re-recite the <b>port table</b>, re-do <b>3 subnetting questions</b>.",
+            "Speed-skim OSI layers + the acronym list. Keep it active-recall — no new material this late."],
+   micro:["🔁 Re-recite the port table","⭐ Re-do 3 subnetting questions","📚 Speed-skim OSI layers + acronyms","🧠 Active recall only — no new material","🎯 Warm up your weak spots"]},
+ {t:"break",micro:["💧 Water — quiz time next"]},
+ {t:"quiz",title:"B.2.1 Exam Practice 1: Networking Concepts (20 Q)",
+   bullets:["Target <b>16/20</b>. Budget ~1.5 min/question.",
+            "Flag-and-return anything that stalls you; don't burn 4 min on one item.",
+            "Eliminate wrong answers first, then choose."],
+   micro:["📝 B.2.1 Exam Practice 1 (20 Q) — aim 16/20","📝 ~1.5 min per question","📝 Flag-and-return anything that stalls","📝 Eliminate wrong answers first","📝 Stay calm — you know this","📝 Finish strong ✨"]},
+ {t:"review",title:"Quiz review",
+   bullets:["Review <b>every</b> wrong or guessed answer. Note the objective number (1.x) next to each miss — that's tomorrow's hit list.",
+            "Under 16/20? It's a practice exam, not the real one. Log the misses and move to wind-down — cramming past 4 AM costs more than it returns."],
+   micro:["🔍 Review EVERY wrong/guessed answer","🗒️ Note the 1.x objective → tomorrow's hit list"]},
+
+ {t:"rest",kind:"winddown",title:"WIND-DOWN",sub:"4:00 AM → bed, ~20–25 min",
+   steps:["🧴 <b>Skincare</b> routine","🪥 <b>Brush teeth</b>","🛏️ <b>Make the bed / quick tidy</b> of the space","👕 <b>Set out tomorrow's clothes</b>","🗒️ <b>Plan tomorrow (5 min)</b> — pull up tonight's quiz-miss list (those objectives are first up), decide your next move (re-drill misses · remaining Domain 1 labs · open Domain 2) and write the single first task.","😴 <b>Lights out</b>"],
+   micro:["🧴 Skincare routine","🪥 Brush teeth","🛏️ Make the bed / tidy","👕 Set out tomorrow's clothes","🗒️ Plan tomorrow — quiz-miss list first","😴 Lights out — protect your sleep 💤"]},
+];
 
 function nsPad(n){return String(n).padStart(2,"0");}
 function nsKey(i){const h=(NIGHT_START+Math.floor(i/12))%24;const m=(i%12)*5;return nsPad(h)+":"+nsPad(m);}
 function nsHourLabel(h){const ap=h<12?"AM":"PM";const hr=(h%12===0)?12:h%12;return hr+":00 "+ap;}
 function nsEsc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function fmtClock(min){let h=Math.floor(min/60)%24;if(h<0)h+=24;const m=((min%60)+60)%60;const ap=h<12?"AM":"PM";const hr=(h%12===0)?12:h%12;return hr+":"+nsPad(m)+" "+ap;}
 
-let _nsDefCache=null;
-function nightDefault(){
-  if(_nsDefCache)return _nsDefCache;
-  const out={};const total=NIGHT_HOURS*12;let si=0,bi=0,fi=0;
-  for(let cyc=0;cyc*6<total;cyc++){
-    const longBreak=(cyc%4===3);            // every 2 hrs → fuel break
-    const task=NS_STUDY[si%NS_STUDY.length];si++;
-    for(let p=0;p<6;p++){
-      const i=cyc*6+p;if(i>=total)break;const k=nsKey(i);
-      if(p<5){out[k]={t:p===0?task:NS_CONT[(p-1)%NS_CONT.length],type:"study"};}
-      else if(longBreak){out[k]={t:NS_FUEL[fi%NS_FUEL.length],type:"fuel"};fi++;}
-      else{out[k]={t:NS_BREAK[bi%NS_BREAK.length],type:"break"};bi++;}
-    }
+/* Walk the plan, anchoring P1 at the start hour; compute each entry's clock + grid blocks. */
+function nightSchedule(){
+  const base=NIGHT_START*60;let cum=0;const items=[];
+  for(const e of NIGHT_DETAIL){
+    if(e.sec){items.push({e,sec:true,startMin:base+cum});continue;}
+    const blocks=(e.micro||[]).length;
+    items.push({e,startMin:base+cum,endMin:base+cum+blocks*5,blocks});
+    cum+=blocks*5;
   }
-  _nsDefCache=out;return out;
+  for(let i=0;i<items.length;i++){
+    if(items[i].sec){let end=base+cum;for(let j=i+1;j<items.length;j++){if(items[j].sec){end=items[j].startMin;break;}}items[i].endMin=end;}
+  }
+  return items;
+}
+/* Map the plan onto 5-min grid keys; pad any leftover hours with sleep. */
+function nightDefault(){
+  const out={};let idx=0;const total=NIGHT_HOURS*12;
+  for(const e of NIGHT_DETAIL){
+    if(e.sec)continue;const m=e.micro||[];
+    for(let b=0;b<m.length;b++){if(idx>=total)return out;out[nsKey(idx)]={t:m[b],type:e.t};idx++;}
+  }
+  while(idx<total){out[nsKey(idx)]={t:"😴 Sleep — protect these hours 💤",type:"rest"};idx++;}
+  return out;
 }
 function nightCell(k){
   if(nightEdits[k]!==undefined)return nightEdits[k];
-  if(nightMode==="suggested"){const d=nightDefault();return d[k]||{t:"",type:"open"};}
+  if(nightMode==="timeline"){const d=nightDefault();return d[k]||{t:"",type:"open"};}
   return {t:"",type:"open"};
 }
 
@@ -1457,40 +1573,58 @@ function pageNight(){
     <span class="ns-float f4">✨</span><span class="ns-float f5">🌟</span><span class="ns-float f6">🦉</span>
   </div>
   <h2 class="page-title">🌙 Night Sprint <span class="ns-spark">✦</span></h2>
-  <p class="page-sub">Your late-night cram, mapped to the minute — every block is 5 cozy minutes. Click any block to edit it, tap the little emoji to switch its vibe. It all saves automatically. You've got this ʕ•ᴥ•ʔ💖</p>
+  <p class="page-sub">Unit 1 cram, mapped to the minute. <b>Timeline</b> = an editable 5-min grid pre-filled with your exact tasks · <b>Full Plan</b> = every detail in text · <b>Blank</b> = clean slate. Click any block to edit, tap the emoji to switch its vibe — it all saves automatically. You've got this ʕ•ᴥ•ʔ💖</p>
   <div class="ns-banner">
-    <h3><span class="ns-moon">🌙</span> Tonight's sprint, five minutes at a time</h3>
-    <p>Pomodoro-style focus blocks 💜 with cozy breaks 💚, midnight fuel ☕ &amp; rest 💤. Pick <b>Suggested</b> for a ready-made plan or <b>Blank</b> for a clean slate. (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</p>
+    <h3><span class="ns-moon">🌙</span> CompTIA Network+ · Unit 1 Night Sprint</h3>
+    <p>🎯 Goal: command all <b>Domain 1.0</b> objectives (1.1–1.8) &amp; pass <b>B.2.1 Exam Practice 1</b> at 80%+ (16/20). 4 pomodoros per block: <code>25 focus → 5 break ×3</code>, then a 30-min big break. (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</p>
     <div class="ns-prog"><div id="ns-fill" class="ns-fill"></div></div>
     <span class="ns-count" id="ns-count">✨</span>
   </div>
   <div class="cal-toolbar">
     <div class="seg">
-      <button id="nm-suggested" onclick="setNightMode('suggested')">✨ Suggested</button>
-      <button id="nm-blank" onclick="setNightMode('blank')">📝 Blank</button>
+      <button id="nv-timeline" onclick="setNightView('timeline')">🗓️ Timeline</button>
+      <button id="nv-full" onclick="setNightView('full')">📋 Full Plan</button>
+      <button id="nv-blank" onclick="setNightView('blank')">📝 Blank</button>
     </div>
-    <button class="ns-reset" onclick="resetNight()">🧹 Reset edits</button>
+    <button class="ns-reset" id="ns-reset-btn" onclick="resetNight()">🧹 Reset edits</button>
+  </div>
+  <div class="ns-adjust" id="ns-adjust">
+    <span class="ns-adj-grp">🕙 Start <button onclick="adjStart(-1)" title="earlier">‹</button><b id="ns-start-lbl"></b><button onclick="adjStart(1)" title="later">›</button></span>
+    <span class="ns-adj-grp">⏳ Hours <button onclick="adjHours(-1)" title="fewer">‹</button><b id="ns-hours-lbl"></b><button onclick="adjHours(1)" title="more">›</button></span>
   </div>
   <div id="ns-body"></div>
-  <div class="callout" style="margin-top:14px;">💜 study · 💚 break · ☕ fuel · 💤 rest · ✨ open — tap the emoji on any row to cycle its vibe. Sweet dreams of subnets, you night owl 🦉💕</div>
+  <div class="callout" style="margin-top:14px;">💜 study · 💚 break · ☕ fuel · 📝 quiz · 🔍 review · 💤 rest · ✨ open — tap the emoji on any row to cycle its vibe. Sweet dreams of subnets, you night owl 🦉💕</div>
   </div>`;
 }
 function initNight(){
-  ["suggested","blank"].forEach(m=>{const b=document.getElementById("nm-"+m);if(b)b.classList.toggle("active",m===nightMode);});
+  ["timeline","full","blank"].forEach(m=>{const b=document.getElementById("nv-"+m);if(b)b.classList.toggle("active",m===nightMode);});
+  const grid=(nightMode!=="full");
+  const adj=document.getElementById("ns-adjust");if(adj)adj.style.display=grid?"flex":"none";
+  const rb=document.getElementById("ns-reset-btn");if(rb)rb.style.display=grid?"inline-block":"none";
+  const sl=document.getElementById("ns-start-lbl");if(sl)sl.textContent=nsHourLabel(NIGHT_START).replace(":00","");
+  const hl=document.getElementById("ns-hours-lbl");if(hl)hl.textContent=NIGHT_HOURS;
   renderNight();
 }
-function setNightMode(m){nightMode=m;try{localStorage.setItem(NMKEY,m);}catch(e){}initNight();playTick();}
+function setNightView(v){nightMode=v;try{localStorage.setItem(NMKEY,v);}catch(e){}initNight();playTick();}
+function adjStart(d){NIGHT_START=((NIGHT_START+d)%24+24)%24;saveNightCfg();initNight();playTick();}
+function adjHours(d){NIGHT_HOURS=Math.min(16,Math.max(1,NIGHT_HOURS+d));saveNightCfg();initNight();playTick();}
 function resetNight(){
   if(!confirm("Clear all your night-sprint edits and go back to the suggested plan? 🧹"))return;
   nightEdits={};saveNight();initNight();toast("✨ Reset to the suggested night sprint");
 }
 function renderNight(){
+  if(nightMode==="full"){renderNightFull();return;}
+  renderNightGrid();
+}
+function renderNightGrid(){
+  const def=(nightMode==="blank")?null:nightDefault();
   const total=NIGHT_HOURS*12;let html="",planned=0;
   for(let hb=0;hb<NIGHT_HOURS;hb++){
     const h=(NIGHT_START+hb)%24;
     html+=`<div class="ns-hourblock"><div class="ns-hourhead"><span class="ns-he">${NIGHT_EMOJI[h]||"🌙"}</span>${nsHourLabel(h)}<span class="ns-line"></span></div>`;
     for(let m=0;m<12;m++){
-      const i=hb*12+m;const k=nsKey(i);const v=nightCell(k);
+      const i=hb*12+m;const k=nsKey(i);
+      const v=(nightEdits[k]!==undefined)?nightEdits[k]:((def&&def[k])?def[k]:{t:"",type:"open"});
       const type=v.type||"open";const txt=v.t||"";if(txt)planned++;
       const vibe=NS_VIBES[type]||NS_VIBES.open;
       html+=`<div class="ns-row ${vibe.cls}" data-k="${k}">
@@ -1505,6 +1639,40 @@ function renderNight(){
   const pct=total?Math.round(planned/total*100):0;
   const pf=document.getElementById("ns-fill");if(pf)pf.style.width=pct+"%";
   const pc=document.getElementById("ns-count");if(pc)pc.textContent=planned+" / "+total+" blocks mapped ✨";
+}
+function renderNightFull(){
+  const items=nightSchedule();
+  let h=`<div class="ns-doc">`;
+  h+=`<div class="ns-doc-goal">🎯 <b>Goal:</b> solid command of all <b>Domain 1.0</b> objectives (1.1–1.8) and pass <b>B.2.1 Exam Practice 1: Networking Concepts</b> (20 Q) at 80%+ (<b>16/20</b>).</div>`;
+  h+=`<div class="callout">🏃 <b>How to run it</b><br>• 4 pomodoros per study block: <code>25 focus → 5 break ×3</code>, then a <b>30-min block break</b> (your two big breaks).<br>• Labs + quizzes = <b>CertMaster Perform</b>. Videos = Messer / Codecademy. Reading + tool practice = your call.<br>• Highest-yield tonight: <b>subnetting</b> + <b>ports</b> — the two areas Domain 1 punishes you on. Everything else = recognition + one-line definitions.</div>`;
+  h+=`<div class="callout pink">🧃 <b>Break menu</b><br><b>5 min:</b> bathroom · water · stand + 20-20-20 (look 20 ft away 20 sec) · grab a snack · <i>one</i> scroll with a 5-min timer set.<br><b>30 min:</b> real food · Pokopia / a game round · pomodoro-timer upgrades · draw something · stretch or a short walk.</div>`;
+  for(const it of items){
+    const e=it.e;
+    if(it.sec){h+=`<div class="ns-doc-sec"><span>${nsEsc(e.sec)}</span><small>${fmtClock(it.startMin)} – ${fmtClock(it.endMin)}</small></div>`;continue;}
+    const time=`${fmtClock(it.startMin)} – ${fmtClock(it.endMin)}`;
+    if(e.kind==="winddown"){
+      h+=`<div class="ns-card ns-card-rest"><div class="ns-card-h"><span class="ns-chip">${fmtClock(it.startMin)} →</span><b>${nsEsc(e.title)}</b><span class="ns-obj">${nsEsc(e.sub)}</span></div><ol>${e.steps.map(s=>`<li>${s}</li>`).join("")}</ol><div class="ns-sleepnote">💤 Sleep is when tonight's encoding consolidates into retention. The hours you sleep <i>after</i> this session are doing real work for the exam — protect them.</div></div>`;
+    }else if(e.t==="study"){
+      const obj=(e.obj&&e.obj!=="review")?`<span class="ns-obj">Obj ${nsEsc(e.obj)}</span>`:"";
+      h+=`<div class="ns-card"><div class="ns-card-h"><span class="ns-chip">${time}</span><b>${nsEsc(e.title)}</b>${obj}</div><ul>${e.bullets.map(b=>`<li>${b}</li>`).join("")}</ul></div>`;
+    }else if(e.t==="break"){
+      h+=`<div class="ns-doc-break">☕ <b>${time}</b> · ${nsEsc(e.micro[0])}</div>`;
+    }else if(e.t==="fuel"){
+      h+=`<div class="callout pink ns-bigbreak">${e.emoji} <b>${nsEsc(e.title)} · ${time}</b> (30)<br>${nsEsc(e.text)}</div>`;
+    }else if(e.t==="quiz"){
+      h+=`<div class="ns-card ns-card-quiz"><div class="ns-card-h"><span class="ns-chip">${time}</span><b>📝 ${nsEsc(e.title)}</b></div><ul>${e.bullets.map(b=>`<li>${b}</li>`).join("")}</ul></div>`;
+    }else if(e.t==="review"){
+      h+=`<div class="ns-card ns-card-review"><div class="ns-card-h"><span class="ns-chip">${time}</span><b>🔍 ${nsEsc(e.title)}</b></div><ul>${e.bullets.map(b=>`<li>${b}</li>`).join("")}</ul></div>`;
+    }
+  }
+  h+=`<div class="ns-card ns-card-cov"><div class="ns-card-h"><b>✅ Tonight's coverage — all of Domain 1.0</b></div><ul>
+    <li>1.1 OSI → P1</li><li>1.2 Appliances / functions → P2</li><li>1.4 Ports / protocols / traffic → P3</li>
+    <li>1.7 IPv4 addressing + subnetting → P4, P5, P6</li><li>1.6 Topologies + 1.5 media / transceivers → P7</li>
+    <li>1.3 Cloud + 1.8 Modern networks → P8</li><li>Review + quiz → P9 + B.2.1</li></ul></div>`;
+  h+=`</div>`;
+  document.getElementById("ns-body").innerHTML=h;
+  const pf=document.getElementById("ns-fill");if(pf)pf.style.width="100%";
+  const pc=document.getElementById("ns-count");if(pc)pc.textContent="Full plan — 10 PM → 4 AM 🌙";
 }
 function editNight(k,el){
   const cur=el.textContent==="+ add"?"":el.textContent;
